@@ -1,0 +1,46 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Stop Server
+      run: |
+        pm2 stop hubs_server
+        pm2 stop hubs_admin_server
+        
+    - name: Install hubs deps
+      run: npm i --force
+      
+    - name: Install hubs admin deps
+      run: |
+        cd admin/
+        pwd
+        npm i --force
+        ls
+        
+    - name: Start hubs server
+      run: pm2 start hubs_server
+      
+    - name: Start hubs admin server
+      run: pm2 start hubs_admin_server
+    
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
