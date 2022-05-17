@@ -236,21 +236,41 @@ module.exports = async (env, argv) => {
       }
     }
 
-    if (env.localDev) {
-      const localDevHost = "hubs.local";
-      // Local Dev Environment (npm run local)
+    // if (env.localDev) {
+    //   const localDevHost = "hubs.local";
+    //   // Local Dev Environment (npm run local)
+    //   Object.assign(process.env, {
+    //     HOST: localDevHost,
+    //     RETICULUM_SOCKET_SERVER: localDevHost,
+    //     CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+    //     NON_CORS_PROXY_DOMAINS: `${localDevHost},dev.reticulum.io`,
+    //     BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
+    //     RETICULUM_SERVER: `${localDevHost}:4000`,
+    //     POSTGREST_SERVER: "",
+    //     ITA_SERVER: "",
+    //     UPLOADS_HOST: `https://${localDevHost}:4000`
+    //   });
+    // }
+
+    if (env.prodVps) {
+      const domain = "pet-mom.club";
+      
+      // We dont use the reticulum port 4000 because later we will proxy pass from port 443 to 4000
       Object.assign(process.env, {
-        HOST: localDevHost,
-        RETICULUM_SOCKET_SERVER: localDevHost,
-        CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-        NON_CORS_PROXY_DOMAINS: `${localDevHost},dev.reticulum.io`,
-        BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-        RETICULUM_SERVER: `${localDevHost}:4000`,
+        HOST_IP: domain,
+        SHORTLINK_DOMAIN: `${domain}`,
+        HOST: domain,
+        RETICULUM_SOCKET_SERVER: domain,
+        CORS_PROXY_SERVER: `${domain}`,
+        NON_CORS_PROXY_DOMAINS: `${domain},dev.reticulum.io`,
+        BASE_ASSETS_PATH: `https://${domain}:8080/`,
+        RETICULUM_SERVER: domain,
         POSTGREST_SERVER: "",
         ITA_SERVER: "",
-        UPLOADS_HOST: `https://${localDevHost}:4000`
+        UPLOADS_HOST: `https://${domain}`,
       });
     }
+
   }
 
   // In production, the environment variables are defined in CI or loaded from ita and

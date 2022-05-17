@@ -77,6 +77,22 @@ module.exports = (env, argv) => {
     });
   }
 
+  //TODO:
+  if (env.prod) {
+    const domain = "pet-mom.club";
+    Object.assign(process.env, {
+      HOST: domain,
+      RETICULUM_SOCKET_SERVER: domain,
+      CORS_PROXY_SERVER: "hubs-proxy.com",
+      NON_CORS_PROXY_DOMAINS: `${domain},dev.reticulum.io`,
+      BASE_ASSETS_PATH: `https://${domain}:8989/`,
+      RETICULUM_SERVER: domain,
+      POSTGREST_SERVER: "",
+      ITA_SERVER: "",
+      HOST_IP: domain,
+    });
+  }
+
   const defaultHostName = "hubs.local";
   const host = process.env.HOST_IP || defaultHostName;
 
