@@ -105,7 +105,7 @@ module.exports = (env, argv) => {
   );
 
   return {
-    watch: true,
+    watch: false,
     node: {
       fs: "empty"
     },
