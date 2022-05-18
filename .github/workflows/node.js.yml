@@ -39,8 +39,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: npm-
+          key: hubs-${{ hashFiles('package-lock.json') }}
+          restore-keys: hubs-
 
       - name: Install dependency
         run: npm ci --ignore-scripts
