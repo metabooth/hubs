@@ -16,12 +16,17 @@ jobs:
         node-version: [16.x]
 
     steps:
-      - name: Stop Server
+      - name: Stop Server (hubs_server)
         run: |
           pm2 stop --silent hubs_server
-          pm2 stop --silent hubs_admin_server
           pm2 delete --silent hubs_server
+        continue-on-error: true
+
+      - name: Stop Server (hubs_admin_server)
+        run: |
+          pm2 stop --silent hubs_admin_server
           pm2 delete --silent hubs_admin_server
+        continue-on-error: true
 
       - uses: actions/checkout@v3
 
