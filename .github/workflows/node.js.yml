@@ -35,19 +35,26 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Cache dependencies
+      - name: Cache hubs_server dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: hubs-${{ hashFiles('package-lock.json') }}
-          restore-keys: hubs-
+          path: ./node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependency
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
+
+      - name: Cache hubs_server dependencies
+        uses: actions/cache@v3
+        run: |
+          cd admin/
+        with:
+          path: ./node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
 
       - name: Install hubs admin deps
         run: |
-          cd admin/
           pwd
           npm ci --ignore-scripts
           ls
