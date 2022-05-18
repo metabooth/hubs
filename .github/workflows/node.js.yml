@@ -18,10 +18,10 @@ jobs:
     steps:
       - name: Stop Server
         run: |
-          pm2 stop hubs_server
-          pm2 stop hubs_admin_server
-          pm2 delete hubs_server
-          pm2 delete hubs_admin_server
+          pm2 stop --slient hubs_server
+          pm2 stop --slient hubs_admin_server
+          pm2 delete --slient hubs_server
+          pm2 delete --slient hubs_admin_server
 
       - uses: actions/checkout@v3
 
