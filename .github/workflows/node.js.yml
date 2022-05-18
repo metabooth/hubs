@@ -16,11 +16,12 @@ jobs:
         node-version: [16.x]
 
     steps:
-      - uses: actions/checkout@v3
       - name: Stop Server
         run: |
           pm2 stop hubs_server
           pm2 stop hubs_admin_server
+
+      - uses: actions/checkout@v3
 
       - name: Install hubs deps
         run: npm i --force
