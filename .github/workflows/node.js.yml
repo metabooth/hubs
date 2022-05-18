@@ -18,26 +18,38 @@ jobs:
     steps:
       - name: Stop Server (hubs_server)
         run: |
-          pm2 stop --silent hubs_server
-          pm2 delete --silent hubs_server
+          pm2 stop hubs_server
+          pm2 delete hubs_server
         continue-on-error: true
 
       - name: Stop Server (hubs_admin_server)
         run: |
-          pm2 stop --silent hubs_admin_server
-          pm2 delete --silent hubs_admin_server
+          pm2 stop hubs_admin_server
+          pm2 delete hubs_admin_server
         continue-on-error: true
 
       - uses: actions/checkout@v3
 
-      - name: Install hubs deps
-        run: npm i --force
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install dependency
+        run: npm ci --ignore-scripts
 
       - name: Install hubs admin deps
         run: |
           cd admin/
           pwd
-          npm i --force
+          npm ci --ignore-scripts
           ls
           cd ..
 
