@@ -8,7 +8,7 @@ on:
     branches: [developers/lonycell/master]
 
 jobs:
-  build:
+  hubs-server:
     runs-on: self-hosted
 
     strategy:
@@ -22,12 +22,6 @@ jobs:
           pm2 delete hubs_server
         continue-on-error: true
 
-      - name: Stop Server (hubs_admin_server)
-        run: |
-          pm2 stop hubs_admin_server
-          pm2 delete hubs_admin_server
-        continue-on-error: true
-
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
@@ -39,19 +33,48 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: modules-${{ hashFiles('package-lock.json') }}
+          key: hubs-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependency
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
 
-      - name: Cache hubs_server dependencies
-        uses: actions/cache@v3
+      - name: Register hubs server to PM2
+        run: |
+          pm2 start "npm run prod" --name hubs_server
+
+  hubs-admin:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Stop Server (hubs_admin_server)
+        run: |
+          pm2 stop hubs_admin_server
+          pm2 delete hubs_admin_server
+        continue-on-error: true
+
+      - name: change Working Directory
         run: |
           cd admin/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Cache hubs_admin_server dependencies
+        uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: modules-${{ hashFiles('package-lock.json') }}
+          key: admin-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependency
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Install hubs admin deps
         run: |
@@ -59,10 +82,6 @@ jobs:
           npm ci --ignore-scripts
           ls
           cd ..
-
-      - name: Register hubs server to PM2
-        run: |
-          pm2 start "npm run prod" --name hubs_server
 
       - name: Register hubs admin server to PM2
         run: |
