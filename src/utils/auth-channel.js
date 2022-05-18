@@ -1,4 +1,4 @@
-import uuid from "uuid/v4";
+import {v5 as uuid} from "uuid";
 
 export default class AuthChannel {
   constructor(store) {

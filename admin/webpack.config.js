@@ -7,6 +7,7 @@ const cors = require("cors");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 function createHTTPSConfig() {
   // Generate certs for the local webpack-dev-server.
@@ -36,7 +37,7 @@ function createHTTPSConfig() {
               },
               {
                 type: 2,
-                value: "hubs.local"
+                value: "localhost"
               }
             ]
           }
@@ -66,34 +67,46 @@ module.exports = (env, argv) => {
 
   if (env.local) {
     Object.assign(process.env, {
-      HOST: "hubs.local",
-      RETICULUM_SOCKET_SERVER: "hubs.local",
-      CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-      NON_CORS_PROXY_DOMAINS: "hubs.local,dev.reticulum.io",
-      BASE_ASSETS_PATH: "https://hubs.local:8989/",
-      RETICULUM_SERVER: "hubs.local:4000",
+      HOST: "localhost",
+      RETICULUM_SOCKET_SERVER: "localhost",
+      CORS_PROXY_SERVER: "localhost:4000",
+      NON_CORS_PROXY_DOMAINS: "localhost,pet-mom.club,www.pet-mom.club",
+      BASE_ASSETS_PATH: "https://localhost:8989/",
+      RETICULUM_SERVER: "localhost:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
     });
   }
-
-  //TODO:
-  if (env.prod) {
-    const domain = "pet-mom.club";
+  else if (env.dev) {
+    const domain = "localhost";
     Object.assign(process.env, {
       HOST: domain,
       RETICULUM_SOCKET_SERVER: domain,
-      CORS_PROXY_SERVER: "hubs-proxy.com",
-      NON_CORS_PROXY_DOMAINS: `${domain},dev.reticulum.io`,
+      CORS_PROXY_SERVER: domain,
+      NON_CORS_PROXY_DOMAINS: `${domain}`,
       BASE_ASSETS_PATH: `https://${domain}:8989/`,
       RETICULUM_SERVER: domain,
-      POSTGREST_SERVER: "",
-      ITA_SERVER: "",
+      POSTGREST_SERVER: domain,
+      ITA_SERVER: domain,
+      HOST_IP: domain,
+    });
+  } 
+  else if (env.prod) {
+    const domain = "www.pet-mom.club";
+    Object.assign(process.env, {
+      HOST: domain,
+      RETICULUM_SOCKET_SERVER: domain,
+      CORS_PROXY_SERVER: domain,
+      NON_CORS_PROXY_DOMAINS: `${domain}`,
+      BASE_ASSETS_PATH: `https://${domain}:8989/`,
+      RETICULUM_SERVER: domain,
+      POSTGREST_SERVER: domain,
+      ITA_SERVER: domain,
       HOST_IP: domain,
     });
   }
 
-  const defaultHostName = "hubs.local";
+  const defaultHostName = 'localhost';
   const host = process.env.HOST_IP || defaultHostName;
 
   // Remove comments from .babelrc
@@ -105,32 +118,50 @@ module.exports = (env, argv) => {
   );
 
   return {
+    watch: false,
     node: {
-      fs: "empty"
+      // need to specify this manually because some random lodash code will try to access
+      // Buffer on the global object if it exists, so webpack will polyfill on its behalf
+      //Buffer: false,
+      //fs: "empty"
+    },
+    stats: {
+      children: true,
+    },
+    resolve: {
+      fallback: {
+        fs: false,
+        path: require.resolve("path-browserify"),
+      }
     },
     entry: {
       admin: path.join(__dirname, "src", "admin.js")
     },
     output: {
+      //TODO: SOOSKIM ! 
+      path: path.resolve(__dirname, './dist'),
       filename: "assets/js/[name]-[chunkhash].js",
       publicPath: process.env.BASE_ASSETS_PATH || ""
     },
     devtool: argv.mode === "production" ? "source-map" : "inline-source-map",
     devServer: {
       https: createHTTPSConfig(),
-      host: process.env.HOST_IP || "0.0.0.0",
+      host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
       port: process.env.PORT || "8989",
-      public: `${host}:${process.env.PORT || "8989"}`,
-      useLocalIp: true,
-      allowedHosts: [host],
+      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
+      //FIXME; SOOSKIM ! - useLocalIp: true,
+      allowedHosts: 'all',
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      before: function(app) {
-        // be flexible with people accessing via a local reticulum on another port
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
-        // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-        app.head("*", function(req, res, next) {
+      //FIXME; SOOSKIM !
+      onBeforeSetupMiddleware: function (devServer) {
+        if (!devServer) {
+          throw new Error('webpack-dev-server is not defined');
+        }
+  
+        devServer.app.use(cors({ origin: /localhost(:\d*)?$/ }));
+        devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
             res.send("");
@@ -138,10 +169,23 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      }
+      },
+      // before: function(app) {
+      //   // be flexible with people accessing via a local reticulum on another port
+      //   //TODO: SOOSKIM !
+      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
+      //   app.head("*", function(req, res, next) {
+      //     if (req.method === "HEAD") {
+      //       res.append("Date", new Date().toGMTString());
+      //       res.send("");
+      //     } else {
+      //       next();
+      //     }
+      //   });
+      // }
     },
     performance: {
-      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
@@ -164,9 +208,10 @@ module.exports = (env, argv) => {
           test: /\.worker\.js$/,
           loader: "worker-loader",
           options: {
-            name: "assets/js/[name]-[hash].js",
             publicPath: "/",
-            inline: true
+            filename: "assets/js/[name]-[hash].js",
+            publicPath: "/",
+            inline: "fallback"
           }
         },
         {
@@ -189,6 +234,13 @@ module.exports = (env, argv) => {
         {
           test: /\.(glsl|frag|vert)$/,
           use: { loader: "raw-loader" }
+        },
+        {
+          test: /\.ico$/i,
+          type: "asset/resource",
+          generator: {
+              filename: "[name][ext][query]"
+          }
         },
         {
           test: /\.(png|jpg|gif|glb|ogg|mp3|mp4|wav|woff2|svg|webm)$/,
@@ -216,19 +268,24 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new CleanWebpackPlugin(),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "src/assets/images/favicon.ico",
+            to: "favicon.ico"
+          }
+        ]}
+      ),
       new HTMLWebpackPlugin({
         filename: "admin.html",
-        template: path.join(__dirname, "src", "admin.html")
+        template: path.join(__dirname, "src", "admin.html"),
+        favicon: "src/assets/images/favicon.ico",
+        inject: "head",
       }),
-      new CopyWebpackPlugin([
-        {
-          from: "src/assets/images/favicon.ico",
-          to: "favicon.ico"
-        }
-      ]),
       // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
-        filename: "assets/stylesheets/[name]-[contenthash].css",
+        filename: "assets/stylesheets/[name]-[hash].css",
         disable: argv.mode !== "production"
       }),
       // Define process.env variables in the browser context.

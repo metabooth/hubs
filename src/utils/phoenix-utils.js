@@ -6,14 +6,18 @@ import { sleep } from "../utils/async-utils";
 import Store from "../storage/store";
 
 export function hasReticulumServer() {
+  console.log("phoenix-utils: hasReticulumServer ? ", configs.RETICULUM_SERVER);
   return !!configs.RETICULUM_SERVER;
 }
 
 export function isLocalClient() {
+  console.log("phoenix-utils: isLocalClient ? ", document.location.host, configs.RETICULUM_SERVER);
   return hasReticulumServer() && document.location.host !== configs.RETICULUM_SERVER;
 }
 
 export function hubUrl(hubId, extraParams, slug) {
+  console.log("phoenix-utils: hubUrl <- ", hubId, extraParams, slug);
+
   if (!hubId) {
     if (isLocalClient()) {
       hubId = new URLSearchParams(location.search).get("hub_id");
@@ -36,6 +40,8 @@ export function hubUrl(hubId, extraParams, slug) {
       url.searchParams.set(key, extraParams[key]);
     }
   }
+
+  console.log("phoenix-utils: hubUrl -> ", url);
 
   return url;
 }
@@ -60,11 +66,21 @@ export function getUploadsUrl(path, absolute = false, host = null, port = null) 
   // since reticulum will only serve uploads via the Cloudflare worker. BASE_ASSETS_PATH will have been
   // correctly configured to use the Cloudflare worker, though we only need the hostname,
   // not the full assets URL.
+  console.log("phoenix-utils: getUploadsUrl <- ", path);
+
   const isUsingCloudflare = configs.BASE_ASSETS_PATH.includes("workers.dev");
+
+  console.log("phoenix-utils: getUploadsUrl:isUsingCloudflare = ", isUsingCloudflare);
+  
   const uploadsHost = isUsingCloudflare ? new URL(configs.BASE_ASSETS_PATH).hostname : configs.UPLOADS_HOST;
-  return uploadsHost
-    ? `https://${uploadsHost}${port ? `:${port}` : ""}${path}`
-    : getReticulumFetchUrl(path, absolute, host, port);
+
+  console.log("phoenix-utils: getUploadsUrl:uploadsHost = ", uploadsHost);
+
+  const  resultHost = uploadsHost ? `https://${uploadsHost}${port ? `:${port}` : ""}${path}` : getReticulumFetchUrl(path, absolute, host, port);
+
+  console.log("phoenix-utils: getUploadsUrl:resultHost = ", resultHost);
+
+  return resultHost;
 }
 
 export async function getReticulumMeta() {
@@ -90,6 +106,8 @@ export async function getReticulumMeta() {
     reticulumMeta.phx_host = phxHostOverride;
   }
 
+  console.log("phoenix-utils: getReticulumMeta:reticulumMeta = ", reticulumMeta);
+
   return reticulumMeta;
 }
 
@@ -107,6 +125,8 @@ async function refreshDirectReticulumHostAndPort() {
 }
 
 export function getDirectReticulumFetchUrl(path, absolute = false) {
+  console.log("phoenix-utils: getDirectReticulumFetchUrl:path = ", path);
+
   if (!directReticulumHostAndPort) {
     console.warn("Cannot call getDirectReticulumFetchUrl before connectToReticulum. Returning non-direct url.");
     return getReticulumFetchUrl(path, absolute);
@@ -122,6 +142,8 @@ export async function invalidateReticulumMeta() {
 }
 
 export async function connectToReticulum(debug = false, params = null, socketClass = Socket) {
+  console.log("phoenix-utils: connectToReticulum ...");
+
   const qs = new URLSearchParams(location.search);
 
   const getNewSocketUrl = async () => {
@@ -168,11 +190,15 @@ export async function connectToReticulum(debug = false, params = null, socketCla
 }
 
 export function getLandingPageForPhoto(photoUrl) {
+  console.log("phoenix-utils: getLandingPageForPhoto <- photoUrl ", photoUrl);
+
   const parsedUrl = new URL(photoUrl);
   return getReticulumFetchUrl(parsedUrl.pathname.replace(".png", ".html") + parsedUrl.search, true);
 }
 
 export function fetchReticulumAuthenticated(url, method = "GET", payload) {
+  console.log("phoenix-utils: fetchReticulumAuthenticated <- url, payload ", url, payload);
+
   const { token } = window.APP.store.state.credentials;
   const retUrl = getReticulumFetchUrl(url);
   const params = {
@@ -197,6 +223,8 @@ export function fetchReticulumAuthenticated(url, method = "GET", payload) {
 }
 
 export async function createAndRedirectToNewHub(name, sceneId, replace) {
+  console.log("phoenix-utils: createAndRedirectToNewHub(name, sceneId, replace) <- ", name, sceneId, replace);
+
   const createUrl = getReticulumFetchUrl("/api/v1/hubs");
   const payload = { hub: { name: name || generateHubName() } };
 
@@ -250,6 +278,7 @@ export async function createAndRedirectToNewHub(name, sceneId, replace) {
   }
 
   if (replace) {
+    console.log("phoenix-utils: to <- ", url);
     document.location.replace(url);
   } else {
     document.location = url;

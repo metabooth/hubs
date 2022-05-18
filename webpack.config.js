@@ -97,6 +97,9 @@ function deepModuleDependencyTest(modulesArr) {
     }
 
     const name = module.nameForCondition();
+    if (!name) {
+      return false;
+    }
 
     return deps.some(depName => name.startsWith(depName));
   };
@@ -165,7 +168,8 @@ async function fetchAppConfigAndEnvironmentVars() {
   const appConfig = await appConfigsResponse.json();
 
   // dev.reticulum.io doesn't run ita
-  if (host === "dev.reticulum.io") {
+  //if (host === "dev.reticulum.io") {
+    if (host === "www.pet-mom.club") {
     return appConfig;
   }
 
@@ -253,7 +257,7 @@ module.exports = async (env, argv) => {
     // }
 
     if (env.prodVps) {
-      const domain = "pet-mom.club";
+      const domain = "www.pet-mom.club";
       
       // We dont use the reticulum port 4000 because later we will proxy pass from port 443 to 4000
       Object.assign(process.env, {
@@ -283,10 +287,12 @@ module.exports = async (env, argv) => {
   const legacyBabelConfig = {
     presets: ["@babel/react", ["@babel/env", { targets: { ie: 11 } }]],
     plugins: [
-      "@babel/proposal-class-properties",
       "@babel/proposal-object-rest-spread",
       "@babel/plugin-transform-async-to-generator",
-      "@babel/plugin-proposal-optional-chaining"
+      "@babel/plugin-proposal-optional-chaining",
+      ["@babel/proposal-class-properties", { "loose": true }],
+      ["@babel/plugin-proposal-private-methods", { "loose": true }],
+      ["@babel/plugin-proposal-private-property-in-object", { "loose": true }]
     ]
   };
 
@@ -303,12 +309,23 @@ module.exports = async (env, argv) => {
   }
 
   return {
+    watch: false,
     node: {
       // need to specify this manually because some random lodash code will try to access
       // Buffer on the global object if it exists, so webpack will polyfill on its behalf
-      Buffer: false,
-      fs: "empty"
+      //Buffer: false,
+      //fs: "empty"
     },
+    stats: {
+      children: true,
+    },
+    resolve: {
+      fallback: {
+        fs: false,
+        path: require.resolve("path-browserify")
+      }
+    },
+
     entry: {
       support: path.join(__dirname, "src", "support.js"),
       index: path.join(__dirname, "src", "index.js"),
@@ -332,12 +349,12 @@ module.exports = async (env, argv) => {
     devServer: {
       https: createHTTPSConfig(),
       host: "0.0.0.0",
-      public: `${host}:8080`,
-      useLocalIp: true,
-      allowedHosts: [host, "hubs.local"],
+      //public: `${host}:8080`,
+      //useLocalIp: true,
+      allowedHosts: [host, "localhost", "hubs.local"],
       headers: devServerHeaders,
       hot: liveReload,
-      inline: liveReload,
+      //inline: true,
       historyApiFallback: {
         rewrites: [
           { from: /^\/signin/, to: "/signin.html" },
@@ -348,9 +365,9 @@ module.exports = async (env, argv) => {
           { from: /^\/whats-new/, to: "/whats-new.html" }
         ]
       },
-      before: function(app) {
+      onBeforeSetupMiddleware: function (devServer) {
         // Local CORS proxy
-        app.all("/cors-proxy/*", (req, res) => {
+        devServer.app.all("/cors-proxy/*", (req, res) => {
           res.header("Access-Control-Allow-Origin", "*");
           res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
           res.header("Access-Control-Allow-Headers", "Range");
@@ -364,7 +381,7 @@ module.exports = async (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://localhost:8080/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
@@ -381,9 +398,10 @@ module.exports = async (env, argv) => {
         });
 
         // be flexible with people accessing via a local reticulum on another port
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        //TODO; SOOSKIM
+        devServer.app.use(cors({ origin: ['/localhost(:\d*)?$/', '/hubs\.local(:\d*)?$/'] }));
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-        app.head("*", function(req, res, next) {
+        devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
             res.send("");
@@ -413,9 +431,9 @@ module.exports = async (env, argv) => {
           test: /\.worker\.js$/,
           loader: "worker-loader",
           options: {
-            name: "assets/js/[name]-[hash].js",
+            filename: "assets/js/[name]-[contenthash].js",
             publicPath: "/",
-            inline: true
+            inline: "fallback"
           }
         },
         {

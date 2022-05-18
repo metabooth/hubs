@@ -71,3 +71,17 @@ Mozilla and Hubs believe that privacy is fundamental to a healthy internet. Read
 ## License
 
 Hubs is licensed with the [Mozilla Public License 2.0](./LICENSE)
+
+---
+
+## Additional Developer Notes
+
+* Run Hubs dist with NGINX docker image as static web
+```
+docker run -it --rm -d -p 8080:80 --name hubs-main -v /mnt/d/works/mozilla-hub/metabooth/hubs/dist:/usr/share/nginx/html nginx
+```
+
+* Run Admin dist with NGINX docker image as static web
+```
+docker run -it --rm -d -p 8989:80 --name hubs-admin -v /mnt/d/works/mozilla-hub/metabooth/hubs/admin/dist:/usr/share/nginx/html nginx
+```
