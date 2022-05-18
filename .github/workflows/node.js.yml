@@ -8,8 +8,21 @@ on:
     branches: [developers/lonycell/master]
 
 jobs:
+  stop-servers:
+    name: stop-servers
+    runs-on: self-hosted
+    steps:
+      - name: Stop Servers
+        run: |
+          pm2 stop hubs_server
+          pm2 delete hubs_server
+          pm2 stop hubs_admin_server
+          pm2 delete hubs_admin_server
+        continue-on-error: true
+
   hubs-server:
     name: hubs-server
+    needs: stop-servers
     runs-on: self-hosted
 
     strategy:
@@ -17,12 +30,6 @@ jobs:
         node-version: [16.x]
 
     steps:
-      - name: Stop Server (hubs_server)
-        run: |
-          pm2 stop hubs_server
-          pm2 delete hubs_server
-        continue-on-error: true
-
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
@@ -39,10 +46,6 @@ jobs:
       - name: Install dependency
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts
-
-      - name: Register hubs server to PM2
-        run: |
-          pm2 start "npm run prod" --name hubs_server
 
   hubs-admin:
     name: hubs-admin
@@ -79,6 +82,12 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Register hubs admin server to PM2
+  run-servers:
+    name: run-servers
+    needs: hubs-admin
+    runs-on: self-hosted
+    steps:
+      - name: Run Servers
         run: |
+          pm2 start "npm run prod" --name hubs_server
           pm2 start "npm run prod" --name hubs_admin_server

@@ -17,6 +17,7 @@
     "start": "webpack-dev-server --mode=development --env.loadAppConfig",
     "dev": "webpack-dev-server --mode=development --env.remoteDev",
     "local": "webpack-dev-server --mode=development --env.localDev --https --cert certs/cert.pem --key certs/key.pem",
+    "prod-local": "webpack-dev-server --mode=production --env.prodVps --https --cert certs/cert.pem --key certs/key.pem",
     "prod": "webpack-dev-server --mode=production --env.prodVps --https --cert /home/lonycell/server/.certs/pet-mom.club/cert.pem --key /home/lonycell/server/.certs/pet-mom.club/privkey.pem",
     "build": "rimraf ./dist && webpack --mode=production",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",

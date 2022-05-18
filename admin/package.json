@@ -11,6 +11,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode=development --env.hubsCloudDev",
     "dev": "webpack-dev-server --mode=development --env.dev",
+    "prod-local": "webpack-dev-server --mode=production --env.prod=true --https --cert certs/cert.pem --key certs/key.pem",
     "prod": "webpack-dev-server --mode=production --env.prod=true --https --cert /home/lonycell/server/.certs/pet-mom.club/cert.pem --key /home/lonycell/server/.certs/pet-mom.club/key.pem",
     "local": "webpack-dev-server --mode=development --env.local --https --cert certs/cert.pem --key certs/key.pem",
     "build": "rimraf ./dist && webpack --mode=production",
