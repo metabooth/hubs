@@ -55,7 +55,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+## .env
 
 # Ignore dist folder with webpack build output
 dist/
