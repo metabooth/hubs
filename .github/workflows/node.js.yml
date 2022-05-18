@@ -9,6 +9,7 @@ on:
 
 jobs:
   hubs-server:
+    name: hubs-server
     runs-on: self-hosted
 
     strategy:
@@ -44,6 +45,8 @@ jobs:
           pm2 start "npm run prod" --name hubs_server
 
   hubs-admin:
+    name: hubs-admin
+    needs: hubs-server
     runs-on: self-hosted
 
     strategy:
@@ -76,14 +79,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Install hubs admin deps
-        run: |
-          pwd
-          npm ci --ignore-scripts
-          ls
-          cd ..
-
       - name: Register hubs admin server to PM2
         run: |
-          cd admin/
           pm2 start "npm run prod" --name hubs_admin_server
