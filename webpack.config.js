@@ -97,6 +97,9 @@ function deepModuleDependencyTest(modulesArr) {
     }
 
     const name = module.nameForCondition();
+    if (!name) {
+      return false;
+    }
 
     return deps.some(depName => name.startsWith(depName));
   };
@@ -253,7 +256,7 @@ module.exports = async (env, argv) => {
     // }
 
     if (env.prodVps) {
-      const domain = "pet-mom.club";
+      const domain = "www.pet-mom.club";
       
       // We dont use the reticulum port 4000 because later we will proxy pass from port 443 to 4000
       Object.assign(process.env, {
@@ -283,10 +286,12 @@ module.exports = async (env, argv) => {
   const legacyBabelConfig = {
     presets: ["@babel/react", ["@babel/env", { targets: { ie: 11 } }]],
     plugins: [
-      "@babel/proposal-class-properties",
       "@babel/proposal-object-rest-spread",
       "@babel/plugin-transform-async-to-generator",
-      "@babel/plugin-proposal-optional-chaining"
+      "@babel/plugin-proposal-optional-chaining",
+      ["@babel/proposal-class-properties", { "loose": true }],
+      ["@babel/plugin-proposal-private-methods", { "loose": true }],
+      ["@babel/plugin-proposal-private-property-in-object", { "loose": true }]
     ]
   };
 
@@ -307,9 +312,19 @@ module.exports = async (env, argv) => {
     node: {
       // need to specify this manually because some random lodash code will try to access
       // Buffer on the global object if it exists, so webpack will polyfill on its behalf
-      Buffer: false,
-      fs: "empty"
+      //Buffer: false,
+      //fs: "empty"
     },
+    stats: {
+      children: true,
+    },
+    resolve: {
+      fallback: {
+        fs: false,
+        path: require.resolve("path-browserify")
+      }
+    },
+
     entry: {
       support: path.join(__dirname, "src", "support.js"),
       index: path.join(__dirname, "src", "index.js"),
@@ -414,9 +429,9 @@ module.exports = async (env, argv) => {
           test: /\.worker\.js$/,
           loader: "worker-loader",
           options: {
-            name: "assets/js/[name]-[hash].js",
+            filename: "assets/js/[name]-[contenthash].js",
             publicPath: "/",
-            inline: true
+            inline: "fallback"
           }
         },
         {
