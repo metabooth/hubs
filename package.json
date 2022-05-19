@@ -19,7 +19,7 @@
     "local": "webpack-dev-server --mode=development --env.localDev --https --cert certs/cert.pem --key certs/key.pem",
     "prod-local": "webpack-dev-server --mode=production --env.prodVps --https --cert certs/cert.pem --key certs/key.pem",
     "prod": "webpack-dev-server --mode=production --env.prodVps --https --cert /home/lonycell/server/.certs/pet-mom.club/cert.pem --key /home/lonycell/server/.certs/pet-mom.club/privkey.pem",
-    "build": "rimraf ./dist && webpack --mode=production",
+    "build": "rm -rf ./dist && webpack --mode=production --https --cert /home/lonycell/server/.certs/pet-mom.club/cert.pem --key /home/lonycell/server/.certs/pet-mom.club/privkey.pem",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",
     "doc": "node ./scripts/doc/build.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
