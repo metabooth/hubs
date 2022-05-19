@@ -168,7 +168,8 @@ async function fetchAppConfigAndEnvironmentVars() {
   const appConfig = await appConfigsResponse.json();
 
   // dev.reticulum.io doesn't run ita
-  if (host === "dev.reticulum.io") {
+  //if (host === "dev.reticulum.io") {
+    if (host === "reticulum.pet-mom.club") {
     return appConfig;
   }
 
