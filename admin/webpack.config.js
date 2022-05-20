@@ -7,6 +7,7 @@ const cors = require("cors");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 function createHTTPSConfig() {
   // Generate certs for the local webpack-dev-server.
@@ -107,12 +108,26 @@ module.exports = (env, argv) => {
   return {
     watch: false,
     node: {
-      fs: "empty"
+      // need to specify this manually because some random lodash code will try to access
+      // Buffer on the global object if it exists, so webpack will polyfill on its behalf
+      //Buffer: false,
+      //fs: "empty"
+    },
+    stats: {
+      children: true,
+    },
+    resolve: {
+      fallback: {
+        fs: false,
+        path: require.resolve("path-browserify"),
+      }
     },
     entry: {
       admin: path.join(__dirname, "src", "admin.js")
     },
     output: {
+      //TODO: SOOSKIM ! 
+      path: path.resolve(__dirname, './dist'),
       filename: "assets/js/[name]-[chunkhash].js",
       publicPath: process.env.BASE_ASSETS_PATH || ""
     },
@@ -129,6 +144,7 @@ module.exports = (env, argv) => {
       },
       before: function(app) {
         // be flexible with people accessing via a local reticulum on another port
+        //TODO: SOOSKIM !
         app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         app.head("*", function(req, res, next) {
@@ -165,9 +181,10 @@ module.exports = (env, argv) => {
           test: /\.worker\.js$/,
           loader: "worker-loader",
           options: {
-            name: "assets/js/[name]-[hash].js",
             publicPath: "/",
-            inline: true
+            filename: "assets/js/[name]-[contenthash].js",
+            publicPath: "/",
+            inline: "fallback"
           }
         },
         {
@@ -190,6 +207,13 @@ module.exports = (env, argv) => {
         {
           test: /\.(glsl|frag|vert)$/,
           use: { loader: "raw-loader" }
+        },
+        {
+          test: /\.ico$/i,
+          type: "asset/resource",
+          generator: {
+              filename: "[name][ext][query]"
+          }
         },
         {
           test: /\.(png|jpg|gif|glb|ogg|mp3|mp4|wav|woff2|svg|webm)$/,
@@ -217,16 +241,21 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new CleanWebpackPlugin(),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "src/assets/images/favicon.ico",
+            to: "favicon.ico"
+          }
+        ]}
+      ),
       new HTMLWebpackPlugin({
         filename: "admin.html",
-        template: path.join(__dirname, "src", "admin.html")
+        template: path.join(__dirname, "src", "admin.html"),
+        favicon: "src/assets/images/favicon.ico",
+        inject: "head",
       }),
-      new CopyWebpackPlugin([
-        {
-          from: "src/assets/images/favicon.ico",
-          to: "favicon.ico"
-        }
-      ]),
       // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
