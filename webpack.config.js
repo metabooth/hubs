@@ -169,7 +169,7 @@ async function fetchAppConfigAndEnvironmentVars() {
 
   // dev.reticulum.io doesn't run ita
   //if (host === "dev.reticulum.io") {
-    if (host === "reticulum.pet-mom.club") {
+    if (host === "www.pet-mom.club") {
     return appConfig;
   }
 
