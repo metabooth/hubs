@@ -365,9 +365,9 @@ module.exports = async (env, argv) => {
           { from: /^\/whats-new/, to: "/whats-new.html" }
         ]
       },
-      onBeforeSetupMiddleware: function (devServer) {
+      before: function(app) {
         // Local CORS proxy
-        devServer.app.all("/cors-proxy/*", (req, res) => {
+        app.all("/cors-proxy/*", (req, res) => {
           res.header("Access-Control-Allow-Origin", "*");
           res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
           res.header("Access-Control-Allow-Headers", "Range");
@@ -399,9 +399,9 @@ module.exports = async (env, argv) => {
 
         // be flexible with people accessing via a local reticulum on another port
         //TODO; SOOSKIM
-        devServer.app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-        devServer.app.head("*", function(req, res, next) {
+        app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
             res.send("");
