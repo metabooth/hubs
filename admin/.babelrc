@@ -22,8 +22,7 @@
     [
       "react-intl",
       {
-        "messagesDir": "./public/messages",
-        //"enforceDescriptions": false
+        "messagesDir": "./public/messages"
       }
     ],
     "transform-react-jsx-img-import",
