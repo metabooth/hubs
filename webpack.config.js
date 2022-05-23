@@ -399,7 +399,7 @@ module.exports = async (env, argv) => {
 
         // be flexible with people accessing via a local reticulum on another port
         //TODO; SOOSKIM
-        devServer.app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        devServer.app.use(cors({ origin: ['/localhost(:\d*)?$/', '/hubs\.local(:\d*)?$/'] }));
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
