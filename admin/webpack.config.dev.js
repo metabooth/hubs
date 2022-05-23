@@ -16,9 +16,59 @@ function createHTTPSConfig() {
     };
 }
 
+// function createHTTPSConfig() {
+//   // Generate certs for the local webpack-dev-server.
+//   if (fs.existsSync(path.join(__dirname, "certs"))) {
+//     const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
+//     const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+
+//     return { key, cert };
+//   } else {
+//     const pems = selfsigned.generate(
+//       [
+//         {
+//           name: "commonName",
+//           value: "localhost"
+//         }
+//       ],
+//       {
+//         days: 365,
+//         algorithm: "sha256",
+//         extensions: [
+//           {
+//             name: "subjectAltName",
+//             altNames: [
+//               {
+//                 type: 2,
+//                 value: "localhost"
+//               },
+//               {
+//                 type: 2,
+//                 value: "localhost"
+//               }
+//             ]
+//           }
+//         ]
+//       }
+//     );
+
+//     fs.mkdirSync(path.join(__dirname, "certs"));
+//     fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
+//     fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+
+//     return {
+//       key: pems.private,
+//       cert: pems.cert
+//     };
+//   }
+// }
+
 module.exports = (env, argv) => {
   env = env || {};
 
+  // Load environment variables from .env files.
+  // .env takes precedent over .defaults.env
+  // Previously defined environment variables are not overwritten
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
@@ -28,7 +78,7 @@ module.exports = (env, argv) => {
       RETICULUM_SOCKET_SERVER: "localhost",
       CORS_PROXY_SERVER: "localhost:4000",
       NON_CORS_PROXY_DOMAINS: "localhost,dev.reticulum.io",
-      BASE_ASSETS_PATH: "https://localhost:8990/",
+      BASE_ASSETS_PATH: "https://localhost:8989/",
       RETICULUM_SERVER: "localhost:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
@@ -43,7 +93,7 @@ module.exports = (env, argv) => {
       RETICULUM_SOCKET_SERVER: domain,
       CORS_PROXY_SERVER: domain,
       NON_CORS_PROXY_DOMAINS: `${domain}`,
-      BASE_ASSETS_PATH: `https://${domain}:8990/`,
+      BASE_ASSETS_PATH: `https://${domain}:8989/`,
       RETICULUM_SERVER: domain,
       POSTGREST_SERVER: domain,
       ITA_SERVER: domain,
@@ -89,6 +139,47 @@ module.exports = (env, argv) => {
       publicPath: process.env.BASE_ASSETS_PATH || ""
     },
     devtool: argv.mode === "production" ? "source-map" : "inline-source-map",
+    devServer: {
+      https: createHTTPSConfig(),
+      host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
+      port: process.env.PORT || "8989",
+      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
+      //FIXME; SOOSKIM ! - useLocalIp: true,
+      allowedHosts: 'all',
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
+      //FIXME; SOOSKIM !
+      onBeforeSetupMiddleware: function (devServer) {
+        if (!devServer) {
+          throw new Error('webpack-dev-server is not defined');
+        }
+  
+        devServer.app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
+        devServer.app.head("*", function(req, res, next) {
+          if (req.method === "HEAD") {
+            res.append("Date", new Date().toGMTString());
+            res.send("");
+          } else {
+            next();
+          }
+        });
+      },
+      // before: function(app) {
+      //   // be flexible with people accessing via a local reticulum on another port
+      //   //TODO: SOOSKIM !
+      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
+      //   app.head("*", function(req, res, next) {
+      //     if (req.method === "HEAD") {
+      //       res.append("Date", new Date().toGMTString());
+      //       res.send("");
+      //     } else {
+      //       next();
+      //     }
+      //   });
+      // }
+    },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
@@ -173,9 +264,6 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
-      new webpack.ProvidePlugin({
-        process: 'process/browser'
-      }),
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
         patterns: [
