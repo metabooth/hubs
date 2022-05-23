@@ -32,6 +32,8 @@
     "react-admin": "^4.1.0",
     "react-dom": "^18.1.0",
     "react-intl": "^6.0.2",
+    "react-redux": "^8.0.2",
+    "redux": "^4.2.0",
     "three": "github:metabooth/three.js#developers/lonycell/hubs/master"
   },
   "devDependencies": {
@@ -43,6 +45,7 @@
     "@babel/preset-env": "^7.18.0",
     "@babel/preset-react": "^7.17.2",
     "@babel/register": "^7.17.7",
+    "@types/react-redux": "^7.1.24",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.5",
     "babel-plugin-formatjs": "^10.3.23",
@@ -62,9 +65,9 @@
     "html-webpack-plugin": "^5.5.0",
     "htmlhint": "^1.1.4",
     "mini-css-extract-plugin": "^2.6.0",
-    "process": "^0.11.10",
     "path-browserify": "^1.0.1",
     "prettier": "^2.6.2",
+    "process": "^0.11.10",
     "raw-loader": "^4.0.2",
     "rimraf": "^3.0.2",
     "sass": "^1.52.1",
