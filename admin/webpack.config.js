@@ -44,7 +44,7 @@ function createHTTPSConfig() {
 //               },
 //               {
 //                 type: 2,
-//                 value: "hubs.local"
+//                 value: "localhost"
 //               }
 //             ]
 //           }
@@ -74,12 +74,12 @@ module.exports = (env, argv) => {
 
   if (env.local) {
     Object.assign(process.env, {
-      HOST: "hubs.local",
-      RETICULUM_SOCKET_SERVER: "hubs.local",
-      CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-      NON_CORS_PROXY_DOMAINS: "hubs.local,dev.reticulum.io",
-      BASE_ASSETS_PATH: "https://hubs.local:8990/",
-      RETICULUM_SERVER: "hubs.local:4000",
+      HOST: "localhost",
+      RETICULUM_SOCKET_SERVER: "localhost",
+      CORS_PROXY_SERVER: "localhost:4000",
+      NON_CORS_PROXY_DOMAINS: "localhost,dev.reticulum.io",
+      BASE_ASSETS_PATH: "https://localhost:8990/",
+      RETICULUM_SERVER: "localhost:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
     });
