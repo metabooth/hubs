@@ -78,7 +78,7 @@ module.exports = (env, argv) => {
       RETICULUM_SOCKET_SERVER: "hubs.local",
       CORS_PROXY_SERVER: "hubs-proxy.local:4000",
       NON_CORS_PROXY_DOMAINS: "hubs.local,dev.reticulum.io",
-      BASE_ASSETS_PATH: "https://hubs.local:8989/",
+      BASE_ASSETS_PATH: "https://hubs.local:8990/",
       RETICULUM_SERVER: "hubs.local:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
@@ -93,7 +93,7 @@ module.exports = (env, argv) => {
       RETICULUM_SOCKET_SERVER: domain,
       CORS_PROXY_SERVER: domain,
       NON_CORS_PROXY_DOMAINS: `${domain}`,
-      BASE_ASSETS_PATH: `https://${domain}:8989/`,
+      BASE_ASSETS_PATH: `https://${domain}:8990/`,
       RETICULUM_SERVER: domain,
       POSTGREST_SERVER: domain,
       ITA_SERVER: domain,
@@ -142,8 +142,8 @@ module.exports = (env, argv) => {
     devServer: {
       https: createHTTPSConfig(),
       host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
-      port: process.env.PORT || "8989",
-      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
+      port: process.env.PORT || "8990",
+      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8990"}`,
       //FIXME; SOOSKIM ! - useLocalIp: true,
       allowedHosts: 'all',
       headers: {
