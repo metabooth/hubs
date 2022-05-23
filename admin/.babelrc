@@ -19,16 +19,6 @@
     ]
   ],
   "plugins": [
-    [
-      "formatjs",
-      {
-
-      },
-      "react-intl",
-      {
-        
-      }
-    ],
     "transform-react-jsx-img-import",
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread",
