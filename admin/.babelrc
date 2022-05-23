@@ -20,9 +20,13 @@
   ],
   "plugins": [
     [
+      "formatjs",
+      {
+
+      },
       "react-intl",
       {
-        "extractSourceLocation": "./public/messages"
+        
       }
     ],
     "transform-react-jsx-img-import",
