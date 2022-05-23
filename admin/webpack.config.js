@@ -74,6 +74,9 @@ module.exports = (env, argv) => {
       children: true,
     },
     resolve: {
+      alias: {
+        process: "process/browser"
+      },
       fallback: {
         fs: false,
         path: require.resolve("path-browserify"),
