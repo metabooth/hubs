@@ -30,7 +30,7 @@
     "react-admin": "^4.1.0",
     "react-dom": "^18.1.0",
     "react-intl": "^6.0.2",
-    "three": "github:metabooth/three.js#hubs/master"
+    "three": "github:metabooth/three.js#developers/lonycell/hubs/master"
   },
   "devDependencies": {
     "@babel/core": "^7.18.0",
