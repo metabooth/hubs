@@ -138,16 +138,18 @@ module.exports = (env, argv) => {
       port: process.env.PORT || "8989",
       public: `${host}:${process.env.PORT || "8989"}`,
       useLocalIp: true,
-      allowedHosts: [host],
+      allowedHosts: 'all',
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      before: function(app) {
-        // be flexible with people accessing via a local reticulum on another port
-        //TODO: SOOSKIM !
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
-        // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-        app.head("*", function(req, res, next) {
+      //FIXME; SOOSKIM !
+      onBeforeSetupMiddleware: function (devServer) {
+        if (!devServer) {
+          throw new Error('webpack-dev-server is not defined');
+        }
+  
+        devServer.app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
+        devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
             res.send("");
@@ -155,7 +157,21 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      }
+      },
+      // before: function(app) {
+      //   // be flexible with people accessing via a local reticulum on another port
+      //   //TODO: SOOSKIM !
+      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
+      //   app.head("*", function(req, res, next) {
+      //     if (req.method === "HEAD") {
+      //       res.append("Date", new Date().toGMTString());
+      //       res.send("");
+      //     } else {
+      //       next();
+      //     }
+      //   });
+      // }
     },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
