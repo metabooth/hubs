@@ -117,21 +117,7 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      },
-      // before: function(app) {
-      //   // be flexible with people accessing via a local reticulum on another port
-      //   //TODO: SOOSKIM !
-      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
-      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-      //   app.head("*", function(req, res, next) {
-      //     if (req.method === "HEAD") {
-      //       res.append("Date", new Date().toGMTString());
-      //       res.send("");
-      //     } else {
-      //       next();
-      //     }
-      //   });
-      // }
+      }
     },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
@@ -235,13 +221,10 @@ module.exports = (env, argv) => {
         favicon: "src/assets/images/favicon.ico",
         inject: "head",
       }),
-      // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
-        disable: argv.mode !== "production"
       }),
-      // Define process.env variables in the browser context.
-      new webpack.DefinePlugin({
+      new webpack.ProvidePlugin({
         "process.env": JSON.stringify({
           NODE_ENV: argv.mode,
           BUILD_VERSION: process.env.BUILD_VERSION,
