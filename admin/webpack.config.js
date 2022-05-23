@@ -141,7 +141,7 @@ module.exports = (env, argv) => {
     devtool: argv.mode === "production" ? "source-map" : "inline-source-map",
     devServer: {
       https: createHTTPSConfig(),
-      host: "local-ip", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
+      host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
       port: process.env.PORT || "8989",
       //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
       //FIXME; SOOSKIM ! - useLocalIp: true,
