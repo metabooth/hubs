@@ -217,6 +217,9 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
         patterns: [
