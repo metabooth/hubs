@@ -101,7 +101,7 @@ module.exports = (env, argv) => {
     });
   }
 
-  const defaultHostName = domain;
+  const defaultHostName = 'www.pet-mom.club';
   const host = process.env.HOST_IP || defaultHostName;
 
   // Remove comments from .babelrc
