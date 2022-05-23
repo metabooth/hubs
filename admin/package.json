@@ -9,8 +9,8 @@
     "url": "https://github.com/mozilla/hubs.git"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode=development --env.hubsCloudDev",
-    "dev": "webpack-dev-server --mode=development --env.dev",
+    "start": "webpack-dev-server --mode=development --env env.hubsCloudDev",
+    "dev": "webpack-dev-server --mode=development --env env.dev",
     "prod-local": "webpack-dev-server --mode=production --env.prod=true --https --cert certs/cert.pem --key certs/key.pem",
     "prod": "webpack-dev-server --mode=production --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
     "local": "webpack-dev-server --mode=development --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
