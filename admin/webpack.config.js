@@ -87,21 +87,21 @@ module.exports = (env, argv) => {
 
   //TODO:
   if (env.prod) {
-    const domain = "pet-mom.club";
+    const domain = "www.pet-mom.club";
     Object.assign(process.env, {
       HOST: domain,
       RETICULUM_SOCKET_SERVER: domain,
-      CORS_PROXY_SERVER: "hubs-proxy.com",
-      NON_CORS_PROXY_DOMAINS: `${domain},dev.reticulum.io`,
+      CORS_PROXY_SERVER: domain,
+      NON_CORS_PROXY_DOMAINS: `${domain}`,
       BASE_ASSETS_PATH: `https://${domain}:8989/`,
       RETICULUM_SERVER: domain,
-      POSTGREST_SERVER: "",
-      ITA_SERVER: "",
+      POSTGREST_SERVER: domain,
+      ITA_SERVER: domain,
       HOST_IP: domain,
     });
   }
 
-  const defaultHostName = "hubs.local";
+  const defaultHostName = domain;
   const host = process.env.HOST_IP || defaultHostName;
 
   // Remove comments from .babelrc
