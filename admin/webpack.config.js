@@ -10,51 +10,58 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
-
-    return { key, cert };
-  } else {
-    const pems = selfsigned.generate(
-      [
-        {
-          name: "commonName",
-          value: "localhost"
-        }
-      ],
-      {
-        days: 365,
-        algorithm: "sha256",
-        extensions: [
-          {
-            name: "subjectAltName",
-            altNames: [
-              {
-                type: 2,
-                value: "localhost"
-              },
-              {
-                type: 2,
-                value: "hubs.local"
-              }
-            ]
-          }
-        ]
-      }
-    );
-
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
-
     return {
-      key: pems.private,
-      cert: pems.cert
+      key: "/home/lonycell/server/.certs/pet-mom.club/cert.pem",
+      key: "/home/lonycell/server/.certs/pet-mom.club/key.pem",
     };
-  }
 }
+
+// function createHTTPSConfig() {
+//   // Generate certs for the local webpack-dev-server.
+//   if (fs.existsSync(path.join(__dirname, "certs"))) {
+//     const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
+//     const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+
+//     return { key, cert };
+//   } else {
+//     const pems = selfsigned.generate(
+//       [
+//         {
+//           name: "commonName",
+//           value: "localhost"
+//         }
+//       ],
+//       {
+//         days: 365,
+//         algorithm: "sha256",
+//         extensions: [
+//           {
+//             name: "subjectAltName",
+//             altNames: [
+//               {
+//                 type: 2,
+//                 value: "localhost"
+//               },
+//               {
+//                 type: 2,
+//                 value: "hubs.local"
+//               }
+//             ]
+//           }
+//         ]
+//       }
+//     );
+
+//     fs.mkdirSync(path.join(__dirname, "certs"));
+//     fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
+//     fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+
+//     return {
+//       key: pems.private,
+//       cert: pems.cert
+//     };
+//   }
+// }
 
 module.exports = (env, argv) => {
   env = env || {};
