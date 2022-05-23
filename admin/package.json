@@ -43,7 +43,7 @@
     "@babel/register": "^7.17.7",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.5",
-    "babel-plugin-react-intl": "^10.3.23",
+    "babel-plugin-formatjs": "^10.3.23",
     "babel-plugin-transform-react-jsx-img-import": "^0.1.4",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
