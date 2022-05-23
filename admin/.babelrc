@@ -22,7 +22,7 @@
     [
       "react-intl",
       {
-        "messagesDir": "./public/messages"
+        "extractSourceLocation": "./public/messages"
       }
     ],
     "transform-react-jsx-img-import",
