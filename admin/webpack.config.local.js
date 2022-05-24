@@ -70,14 +70,16 @@ module.exports = (env, argv) => {
       HOST: "localhost",
       RETICULUM_SOCKET_SERVER: "localhost",
       CORS_PROXY_SERVER: "localhost:4000",
-      NON_CORS_PROXY_DOMAINS: "localhost,pet-mom.club,www.pet-mom.club",
+      NON_CORS_PROXY_DOMAINS: "localhost,dev.reticulum.io",
       BASE_ASSETS_PATH: "https://localhost:8989/",
       RETICULUM_SERVER: "localhost:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
     });
   }
-  else if (env.dev) {
+
+  //TODO:
+  if (env.dev) {
     const domain = "localhost";
     Object.assign(process.env, {
       HOST: domain,
@@ -90,8 +92,9 @@ module.exports = (env, argv) => {
       ITA_SERVER: domain,
       HOST_IP: domain,
     });
-  } 
-  else if (env.prod) {
+  }
+
+  if (env.prod) {
     const domain = "www.pet-mom.club";
     Object.assign(process.env, {
       HOST: domain,
@@ -186,6 +189,7 @@ module.exports = (env, argv) => {
       // }
     },
     performance: {
+      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
@@ -209,7 +213,7 @@ module.exports = (env, argv) => {
           loader: "worker-loader",
           options: {
             publicPath: "/",
-            filename: "assets/js/[name]-[hash].js",
+            filename: "assets/js/[name]-[contenthash].js",
             publicPath: "/",
             inline: "fallback"
           }
@@ -285,7 +289,7 @@ module.exports = (env, argv) => {
       }),
       // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
-        filename: "assets/stylesheets/[name]-[hash].css",
+        filename: "assets/stylesheets/[name]-[contenthash].css",
         disable: argv.mode !== "production"
       }),
       // Define process.env variables in the browser context.

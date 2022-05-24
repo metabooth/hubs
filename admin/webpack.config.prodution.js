@@ -10,58 +10,15 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
-
-    return { key, cert };
-  } else {
-    const pems = selfsigned.generate(
-      [
-        {
-          name: "commonName",
-          value: "localhost"
-        }
-      ],
-      {
-        days: 365,
-        algorithm: "sha256",
-        extensions: [
-          {
-            name: "subjectAltName",
-            altNames: [
-              {
-                type: 2,
-                value: "localhost"
-              },
-              {
-                type: 2,
-                value: "localhost"
-              }
-            ]
-          }
-        ]
-      }
-    );
-
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
-
     return {
-      key: pems.private,
-      cert: pems.cert
+      key: "/home/lonycell/server/.certs/pet-mom.club/cert.pem",
+      key: "/home/lonycell/server/.certs/pet-mom.club/key.pem",
     };
-  }
 }
 
 module.exports = (env, argv) => {
   env = env || {};
 
-  // Load environment variables from .env files.
-  // .env takes precedent over .defaults.env
-  // Previously defined environment variables are not overwritten
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
@@ -70,28 +27,16 @@ module.exports = (env, argv) => {
       HOST: "localhost",
       RETICULUM_SOCKET_SERVER: "localhost",
       CORS_PROXY_SERVER: "localhost:4000",
-      NON_CORS_PROXY_DOMAINS: "localhost,pet-mom.club,www.pet-mom.club",
+      NON_CORS_PROXY_DOMAINS: "localhost,dev.reticulum.io",
       BASE_ASSETS_PATH: "https://localhost:8989/",
       RETICULUM_SERVER: "localhost:4000",
       POSTGREST_SERVER: "",
       ITA_SERVER: ""
     });
   }
-  else if (env.dev) {
-    const domain = "localhost";
-    Object.assign(process.env, {
-      HOST: domain,
-      RETICULUM_SOCKET_SERVER: domain,
-      CORS_PROXY_SERVER: domain,
-      NON_CORS_PROXY_DOMAINS: `${domain}`,
-      BASE_ASSETS_PATH: `https://${domain}:8989/`,
-      RETICULUM_SERVER: domain,
-      POSTGREST_SERVER: domain,
-      ITA_SERVER: domain,
-      HOST_IP: domain,
-    });
-  } 
-  else if (env.prod) {
+
+  //TODO:
+  if (env.prod) {
     const domain = "www.pet-mom.club";
     Object.assign(process.env, {
       HOST: domain,
@@ -106,7 +51,7 @@ module.exports = (env, argv) => {
     });
   }
 
-  const defaultHostName = 'localhost';
+  const defaultHostName = 'www.pet-mom.club';
   const host = process.env.HOST_IP || defaultHostName;
 
   // Remove comments from .babelrc
@@ -129,6 +74,9 @@ module.exports = (env, argv) => {
       children: true,
     },
     resolve: {
+      alias: {
+        process: "process/browser"
+      },
       fallback: {
         fs: false,
         path: require.resolve("path-browserify"),
@@ -160,7 +108,7 @@ module.exports = (env, argv) => {
           throw new Error('webpack-dev-server is not defined');
         }
   
-        devServer.app.use(cors({ origin: /localhost(:\d*)?$/ }));
+        devServer.app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
         devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
@@ -169,23 +117,10 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      },
-      // before: function(app) {
-      //   // be flexible with people accessing via a local reticulum on another port
-      //   //TODO: SOOSKIM !
-      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
-      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-      //   app.head("*", function(req, res, next) {
-      //     if (req.method === "HEAD") {
-      //       res.append("Date", new Date().toGMTString());
-      //       res.send("");
-      //     } else {
-      //       next();
-      //     }
-      //   });
-      // }
+      }
     },
     performance: {
+      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
@@ -209,7 +144,7 @@ module.exports = (env, argv) => {
           loader: "worker-loader",
           options: {
             publicPath: "/",
-            filename: "assets/js/[name]-[hash].js",
+            filename: "assets/js/[name]-[contenthash].js",
             publicPath: "/",
             inline: "fallback"
           }
@@ -268,6 +203,9 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
         patterns: [
@@ -283,13 +221,10 @@ module.exports = (env, argv) => {
         favicon: "src/assets/images/favicon.ico",
         inject: "head",
       }),
-      // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
-        filename: "assets/stylesheets/[name]-[hash].css",
-        disable: argv.mode !== "production"
+        filename: "assets/stylesheets/[name]-[contenthash].css",
       }),
-      // Define process.env variables in the browser context.
-      new webpack.DefinePlugin({
+      new webpack.ProvidePlugin({
         "process.env": JSON.stringify({
           NODE_ENV: argv.mode,
           BUILD_VERSION: process.env.BUILD_VERSION,

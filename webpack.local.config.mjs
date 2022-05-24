@@ -1,21 +1,30 @@
-const dotenv = require("dotenv");
-const fs = require("fs");
-const path = require("path");
-const selfsigned = require("selfsigned");
-const webpack = require("webpack");
-const cors = require("cors");
-const HTMLWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-const TOML = require("@iarna/toml");
-const fetch = require("node-fetch");
-const packageLock = require("./package-lock.json");
-const request = require("request");
-const internalIp = require("internal-ip");
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import selfsigned from 'selfsigned';
+import webpack from 'webpack';
+import cors from 'cors';
+import HTMLWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import TOML from '@iarna/toml';
+import fetch from 'node-fetch';
+import request from 'request';
+import {internalIpV4} from 'internal-ip';
+import IconTemplate from './src/react-components/icons/IconTemplate.js';
 
+import { createRequire } from 'module';
+// import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
+
+const require = createRequire(import.meta.url);
+const packageLock = JSON.parse(fs.readFileSync('./package-lock.json'));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const {defaultTemplate} = IconTemplate;
+
+//======================================================================
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
   if (fs.existsSync(path.join(__dirname, "certs"))) {
     const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
     const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
@@ -43,7 +52,7 @@ function createHTTPSConfig() {
               },
               {
                 type: 2,
-                value: "hubs.local"
+                value: "localhost"
               }
             ]
           }
@@ -62,6 +71,7 @@ function createHTTPSConfig() {
   }
 }
 
+//======================================================================
 function getModuleDependencies(moduleName) {
   const deps = packageLock.dependencies;
   const arr = [];
@@ -83,6 +93,7 @@ function getModuleDependencies(moduleName) {
   return arr;
 }
 
+//======================================================================
 function deepModuleDependencyTest(modulesArr) {
   const deps = [];
 
@@ -105,6 +116,7 @@ function deepModuleDependencyTest(modulesArr) {
   };
 }
 
+//======================================================================
 function createDefaultAppConfig() {
   const schemaPath = path.join(__dirname, "src", "schema.toml");
   const schemaString = fs.readFileSync(schemaPath).toString();
@@ -146,6 +158,7 @@ function createDefaultAppConfig() {
   return appConfig;
 }
 
+//======================================================================
 async function fetchAppConfigAndEnvironmentVars() {
   if (!fs.existsSync(".ret.credentials")) {
     throw new Error("Not logged in to Hubs Cloud. Run `npm run login` first.");
@@ -168,9 +181,8 @@ async function fetchAppConfigAndEnvironmentVars() {
   const appConfig = await appConfigsResponse.json();
 
   // dev.reticulum.io doesn't run ita
-  //if (host === "dev.reticulum.io") {
-    if (host === "www.pet-mom.club") {
-    return appConfig;
+  if (host === "dev.reticulum.io") {
+      return appConfig;
   }
 
   const hubsConfigsResponse = await fetch(`https://${host}/api/ita/configs/hubs`, { headers });
@@ -183,25 +195,27 @@ async function fetchAppConfigAndEnvironmentVars() {
 
   const { shortlink_domain, thumbnail_server } = hubsConfigs.general;
 
-  const localIp = process.env.HOST_IP || (await internalIp.v4()) || "localhost";
+  const localIp = process.env.HOST_IP || (await internalIpV4()) || "localhost";
 
   process.env.RETICULUM_SERVER = host;
   process.env.SHORTLINK_DOMAIN = shortlink_domain;
   process.env.CORS_PROXY_SERVER = `${localIp}:8080/cors-proxy`;
   process.env.THUMBNAIL_SERVER = thumbnail_server;
-  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},hubs.local,localhost`;
+  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},localhost,localhost`;
 
   return appConfig;
 }
 
+//======================================================================
 function htmlPagePlugin({ filename, extraChunks = [], chunksSortMode, inject }) {
   const chunkName = filename.match(/(.+).html/)[1];
   const options = {
     filename,
     template: path.join(__dirname, "src", filename),
+    favicon: './admin/src/assets/images/favicon.ico',
     chunks: [...extraChunks, chunkName],
     minify: {
-      removeComments: false
+      removeComments: true
     }
   };
 
@@ -211,7 +225,10 @@ function htmlPagePlugin({ filename, extraChunks = [], chunksSortMode, inject }) 
   return new HTMLWebpackPlugin(options);
 }
 
-module.exports = async (env, argv) => {
+//======================================================================
+// MODULE EXPORTS
+//======================================================================
+export default async (env, argv) => {
   env = env || {};
 
   // Load environment variables from .env files.
@@ -220,68 +237,25 @@ module.exports = async (env, argv) => {
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
-  let appConfig = undefined;
+  let appConfig = createDefaultAppConfig();
 
-  /**
-   * Initialize the Webpack build envrionment for the provided environment.
-   */
+  const localHost = "localhost";
 
-  if (argv.mode !== "production" || env.bundleAnalyzer) {
-    if (env.loadAppConfig || process.env.LOAD_APP_CONFIG) {
-      if (!env.localDev) {
-        // Load and set the app config and environment variables from the remote server.
-        // A Hubs Cloud server or dev.reticulum.io can be used.
-        appConfig = await fetchAppConfigAndEnvironmentVars();
-      }
-    } else {
-      if (!env.localDev) {
-        // Use the default app config with all features enabled.
-        appConfig = createDefaultAppConfig();
-      }
-    }
-
-    // if (env.localDev) {
-    //   const localDevHost = "hubs.local";
-    //   // Local Dev Environment (npm run local)
-    //   Object.assign(process.env, {
-    //     HOST: localDevHost,
-    //     RETICULUM_SOCKET_SERVER: localDevHost,
-    //     CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    //     NON_CORS_PROXY_DOMAINS: `${localDevHost},dev.reticulum.io`,
-    //     BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-    //     RETICULUM_SERVER: `${localDevHost}:4000`,
-    //     POSTGREST_SERVER: "",
-    //     ITA_SERVER: "",
-    //     UPLOADS_HOST: `https://${localDevHost}:4000`
-    //   });
-    // }
-
-    if (env.prodVps) {
-      const domain = "www.pet-mom.club";
-      
-      // We dont use the reticulum port 4000 because later we will proxy pass from port 443 to 4000
-      Object.assign(process.env, {
-        HOST_IP: domain,
-        SHORTLINK_DOMAIN: `${domain}`,
-        HOST: domain,
-        RETICULUM_SOCKET_SERVER: domain,
-        CORS_PROXY_SERVER: `${domain}`,
-        NON_CORS_PROXY_DOMAINS: `${domain},dev.reticulum.io`,
-        BASE_ASSETS_PATH: `https://${domain}:8080/`,
-        RETICULUM_SERVER: domain,
-        POSTGREST_SERVER: "",
-        ITA_SERVER: "",
-        UPLOADS_HOST: `https://${domain}`,
-      });
-    }
-
-  }
+  Object.assign(process.env, {
+    HOST: localHost,
+    RETICULUM_SOCKET_SERVER: localHost,
+    CORS_PROXY_SERVER: "localhost:4000",
+    NON_CORS_PROXY_DOMAINS: `${localHost},pet-mom.club,www.pet-mom.club`,
+    BASE_ASSETS_PATH: `https://${localHost}:8080/`,
+    RETICULUM_SERVER: `${localHost}:4000`,
+    POSTGREST_SERVER: "",
+    ITA_SERVER: "",
+    UPLOADS_HOST: `https://${localHost}:4000`
+  });
 
   // In production, the environment variables are defined in CI or loaded from ita and
   // the app config is injected into the head of the page by Reticulum.
-
-  const host = process.env.HOST_IP || env.localDev || env.remoteDev ? "hubs.local" : "localhost";
-
+  const host = "localhost";
   const liveReload = !!process.env.LIVE_RELOAD || false;
 
   const legacyBabelConfig = {
@@ -351,7 +325,7 @@ module.exports = async (env, argv) => {
       host: "0.0.0.0",
       //public: `${host}:8080`,
       //useLocalIp: true,
-      allowedHosts: [host, "localhost", "hubs.local"],
+      allowedHosts: [host, "localhost", "pet-mom.club", "www.pet-mom.club", "reticulum.pet-mom.club","hubs.pet-mom.club","admin.pet-mom.club","dialog.pet-mom.club"],
       headers: devServerHeaders,
       hot: liveReload,
       //inline: true,
@@ -381,7 +355,7 @@ module.exports = async (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://location:8080/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
@@ -412,7 +386,6 @@ module.exports = async (env, argv) => {
       }
     },
     performance: {
-      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
@@ -424,7 +397,7 @@ module.exports = async (env, argv) => {
           loader: "html-loader",
           options: {
             // <a-asset-item>'s src property is overwritten with the correct transformed asset url.
-            attrs: ["img:src", "a-asset-item:src", "audio:src", "source:src"]
+            //TODO; SOOSKIM ! - attrs: ["img:src", "a-asset-item:src", "audio:src", "source:src"]
           }
         },
         {
@@ -494,31 +467,41 @@ module.exports = async (env, argv) => {
             {
               loader: "css-loader",
               options: {
-                name: "[path][name]-[hash].[ext]",
-                localIdentName: "[name]__[local]__[hash:base64:5]",
-                camelCase: true
+                //TODO; SOOSKIM ! - name: "[path][name]-[hash].[ext]",
+                esModule: false,
+                modules: {
+                  mode: "global",
+                  auto: true,
+                  exportGlobals: true,
+                  namedExport: false,
+                  localIdentName: "[path][name]-[hash]",
+                  localIdentContext: path.resolve(__dirname, "src"),
+                  exportLocalsConvention: "camelCase",
+                  exportOnlyLocals: false,
+                }
               }
             },
             "sass-loader"
           ]
         },
         {
-          test: /\.svg$/,
+          test: /\.svg$/i,
           include: [path.resolve(__dirname, "src", "react-components")],
+          issuer: { and: [ /\.(js|ts|jsx|tsx)x?$/ ] },
           use: [
             {
               loader: "@svgr/webpack",
               options: {
                 titleProp: true,
                 replaceAttrValues: { "#000": "{props.color}" },
-                template: require("./src/react-components/icons/IconTemplate"),
+                template: defaultTemplate,
                 svgoConfig: {
-                  plugins: {
-                    removeViewBox: false,
-                    mergePaths: false,
-                    convertShapeToPath: false,
-                    removeHiddenElems: false
-                  }
+                  plugins: [
+                    {name:'removeViewBox', active: false},
+                    {name:'mergePaths', active: false},
+                    {name:'convertShapeToPath', active: false},
+                    {name:'removeHiddenElems', active: false}
+                  ]
                 }
               }
             },
@@ -602,6 +585,15 @@ module.exports = async (env, argv) => {
       new BundleAnalyzerPlugin({
         analyzerMode: env && env.bundleAnalyzer ? "server" : "disabled"
       }),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: "./admin/src/assets/images/favicon.ico",
+            to: "favicon.ico"
+          }
+        ]}
+      ),
+      // new FaviconsWebpackPlugin('./admin/src/assets/images/favicon.ico'),
       // Each output page needs a HTMLWebpackPlugin entry
       htmlPagePlugin({
         filename: "index.html",
@@ -651,24 +643,21 @@ module.exports = async (env, argv) => {
       htmlPagePlugin({
         filename: "tokens.html"
       }),
-      new CopyWebpackPlugin([
+      new CopyWebpackPlugin({ patterns:[
         {
           from: "src/hub.service.js",
           to: "hub.service.js"
         }
-      ]),
-      new CopyWebpackPlugin([
+      ]}),
+      new CopyWebpackPlugin({ patterns: [
         {
           from: "src/schema.toml",
           to: "schema.toml"
         }
-      ]),
-      // Extract required css and add a content hash.
+      ]}),
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
-        disable: argv.mode !== "production"
       }),
-      // Define process.env variables in the browser context.
       new webpack.DefinePlugin({
         "process.env": JSON.stringify({
           NODE_ENV: argv.mode,
