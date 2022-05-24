@@ -495,7 +495,7 @@ module.exports = async (env, argv) => {
               loader: "css-loader",
               options: {
                 name: "[path][name]-[hash].[ext]",
-                localIdentName: "[name]__[local]__[hash:base64:5]",
+                localIdentName: "[path][name]__[local]--[hash:base64:5]",
                 camelCase: true
               }
             },
