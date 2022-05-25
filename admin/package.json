@@ -15,7 +15,7 @@
     "start:dev": "webpack-dev-server --mode=production --env.prod=true --https --cert certs/cert.pem --key certs/key.pem",
     "start:prod": "webpack-dev-server --mode=production --config webpack.config.production.js --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
     "build": "rimraf ./dist && webpack build --mode=production --config webpack.config.local.js --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
-    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config.production.js --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
+    "build:prod": "rimraf ./dist && webpack build --mode=production --config webpack.config.production.js --env env.prod=true --env https --env cert=/home/lonycell/server/.certs/pet-mom.club/cert.pem --env key=/home/lonycell/server/.certs/pet-mom.club/key.pem",
     "build:local": "rimraf ./dist && webpack build --mode=development --env env.local=true --config webpack.config.local.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
     "lint:js": "eslint '*.js' 'src/**/*.js'",
