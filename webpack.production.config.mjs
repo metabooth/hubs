@@ -331,7 +331,11 @@ export default async (env, argv) => {
           { from: /^\/whats-new/, to: "/whats-new.html" }
         ]
       },
-      onBeforeSetupMiddleware: function (devServer) {
+      setupMiddlewares: function (middlewares, devServer) {
+        if (!devServer) {
+          throw new Error('webpack-dev-server is not defined');
+        }
+
         devServer.app.all("/cors-proxy/*", (req, res) => {
           res.header("Access-Control-Allow-Origin", "*");
           res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
@@ -371,6 +375,8 @@ export default async (env, argv) => {
             next();
           }
         });
+
+        return middlewares;
       }
     },
     performance: {
