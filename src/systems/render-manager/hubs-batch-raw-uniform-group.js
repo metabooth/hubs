@@ -1,4 +1,4 @@
-import { BatchRawUniformGroup } from "@metabooth/three-batch-manager";
+import { BatchRawUniformGroup } from "@mozillareality/three-batch-manager";
 import { Layers } from "../../components/layers";
 import { CAMERA_MODE_INSPECT } from "../camera-system";
 

@@ -83,7 +83,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@mozillareality/easing-functions": "^0.1.1",
-    "@metabooth/three-batch-manager": "github:metabooth/three-batch-manager#developers/lonycell/master",
+    "@mozillareality/three-batch-manager": "github:metabooth/three-batch-manager#developers/lonycell/master",
     "@popperjs/core": "^2.11.5",
     "aframe": "github:metabooth/aframe#developers/lonycell/hubs/master",
     "ammo-debug-drawer": "github:infinitelee/ammo-debug-drawer",
