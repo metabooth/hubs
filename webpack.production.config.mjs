@@ -25,9 +25,11 @@ const {defaultTemplate} = IconTemplate;
 
 //======================================================================
 function createHTTPSConfig() {
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+  const certBase = '/home/lonycell/server';
+
+  if (fs.existsSync(path.join(certBase, ".certs"))) {
+    const key = fs.readFileSync(path.join(certBase, ".certs", "key.pem"));
+    const cert = fs.readFileSync(path.join(certBase, ".certs", "cert.pem"));
 
     return { key, cert };
   } else {
@@ -35,7 +37,7 @@ function createHTTPSConfig() {
       [
         {
           name: "commonName",
-          value: "localhost"
+          value: "host"
         }
       ],
       {
@@ -48,11 +50,11 @@ function createHTTPSConfig() {
             altNames: [
               {
                 type: 2,
-                value: "localhost"
+                value: "host"
               },
               {
                 type: 2,
-                value: "localhost"
+                value: "host"
               }
             ]
           }
@@ -195,13 +197,13 @@ async function fetchAppConfigAndEnvironmentVars() {
 
   const { shortlink_domain, thumbnail_server } = hubsConfigs.general;
 
-  const localIp = process.env.HOST_IP || (await internalIpV4()) || "localhost";
+  const localIp = process.env.HOST_IP || (await internalIpV4()) || "host";
 
   process.env.RETICULUM_SERVER = host;
   process.env.SHORTLINK_DOMAIN = shortlink_domain;
   process.env.CORS_PROXY_SERVER = `${localIp}:8080/cors-proxy`;
   process.env.THUMBNAIL_SERVER = thumbnail_server;
-  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},localhost,localhost`;
+  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},host,host`;
 
   return appConfig;
 }
@@ -231,31 +233,26 @@ function htmlPagePlugin({ filename, extraChunks = [], chunksSortMode, inject }) 
 export default async (env, argv) => {
   env = env || {};
 
-  // Load environment variables from .env files.
-  // .env takes precedent over .defaults.env
-  // Previously defined environment variables are not overwritten
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
   let appConfig = createDefaultAppConfig();
-
-  const localHost = "localhost";
+  const host = "www.pet-mom.club";
+  const port = 4000;
+  const serviceHost = `${host}:4000`;
 
   Object.assign(process.env, {
-    HOST: localHost,
-    RETICULUM_SOCKET_SERVER: localHost,
-    CORS_PROXY_SERVER: "localhost:4000",
-    NON_CORS_PROXY_DOMAINS: `${localHost},pet-mom.club,www.pet-mom.club`,
-    BASE_ASSETS_PATH: `https://${localHost}:8080/`,
-    RETICULUM_SERVER: `${localHost}:4000`,
+    HOST: host,
+    RETICULUM_SOCKET_SERVER: host,
+    CORS_PROXY_SERVER: serviceHost,
+    NON_CORS_PROXY_DOMAINS: `${host},pet-mom.club`,
+    BASE_ASSETS_PATH: `https://${host}:8080/`,
+    RETICULUM_SERVER: serviceHost,
     POSTGREST_SERVER: "",
     ITA_SERVER: "",
-    UPLOADS_HOST: `https://${localHost}:4000`
+    UPLOADS_HOST: `https://${serviceHost}`
   });
 
-  // In production, the environment variables are defined in CI or loaded from ita and
-  // the app config is injected into the head of the page by Reticulum.
-  const host = "localhost";
   const liveReload = !!process.env.LIVE_RELOAD || false;
 
   const legacyBabelConfig = {
@@ -274,7 +271,6 @@ export default async (env, argv) => {
     "Access-Control-Allow-Origin": "*"
   };
 
-  // Behind and environment var for now pending further testing
   if (process.env.DEV_CSP_SOURCE) {
     const CSPResp = await fetch(`https://${process.env.DEV_CSP_SOURCE}/`);
     const remoteCSP = CSPResp.headers.get("content-security-policy");
@@ -319,7 +315,7 @@ export default async (env, argv) => {
     devServer: {
       https: createHTTPSConfig(),
       host: "0.0.0.0",
-      allowedHosts: [host, "localhost", "pet-mom.club", "www.pet-mom.club", "reticulum.pet-mom.club","hubs.pet-mom.club","admin.pet-mom.club","dialog.pet-mom.club"],
+      allowedHosts: [host, "localhost", "hubs.local", "pet-mom.club", "www.pet-mom.club", "reticulum.pet-mom.club","hubs.pet-mom.club","admin.pet-mom.club","dialog.pet-mom.club"],
       headers: devServerHeaders,
       hot: liveReload,
       historyApiFallback: {
@@ -333,7 +329,6 @@ export default async (env, argv) => {
         ]
       },
       onBeforeSetupMiddleware: function (devServer) {
-        // Local CORS proxy
         devServer.app.all("/cors-proxy/*", (req, res) => {
           res.header("Access-Control-Allow-Origin", "*");
           res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
@@ -348,7 +343,7 @@ export default async (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://location:8080/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
@@ -364,7 +359,7 @@ export default async (env, argv) => {
           }
         });
 
-        devServer.app.use(cors({ origin: ['/localhost(:\d*)?$/', '/hubs\.local(:\d*)?$/'] }));
+        devServer.app.use(cors({ origin: ['/host(:\d*)?$/', '/hubs\.local(:\d*)?$/', '/www\.pet-mom\.club(:\d*)?$/'] }));
         devServer.app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
@@ -658,19 +653,19 @@ export default async (env, argv) => {
       }),
       new webpack.DefinePlugin({
         "process.env": JSON.stringify({
-          NODE_ENV: argv.mode,
+          NODE_ENV: 'production',
           SHORTLINK_DOMAIN: process.env.SHORTLINK_DOMAIN,
-          RETICULUM_SERVER: process.env.RETICULUM_SERVER,
-          RETICULUM_SOCKET_SERVER: process.env.RETICULUM_SOCKET_SERVER,
-          THUMBNAIL_SERVER: process.env.THUMBNAIL_SERVER,
-          CORS_PROXY_SERVER: process.env.CORS_PROXY_SERVER,
-          NON_CORS_PROXY_DOMAINS: process.env.NON_CORS_PROXY_DOMAINS,
-          BUILD_VERSION: process.env.BUILD_VERSION,
+          RETICULUM_SERVER: 'www.pet-mom.club:4000',
+          RETICULUM_SOCKET_SERVER: 'www.pet-mom.club:4000',
+          THUMBNAIL_SERVER: 'www.pet-mom.club:8080',
+          CORS_PROXY_SERVER: 'www.pet-mom.club:8080',
+          NON_CORS_PROXY_DOMAINS: 'pet-mom.club',
+          BUILD_VERSION: '1.0.0',
           SENTRY_DSN: process.env.SENTRY_DSN,
           GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-          POSTGREST_SERVER: process.env.POSTGREST_SERVER,
-          UPLOADS_HOST: process.env.UPLOADS_HOST,
-          BASE_ASSETS_PATH: process.env.BASE_ASSETS_PATH,
+          POSTGREST_SERVER: 'www.pet-mom.club:3001',
+          UPLOADS_HOST: 'www.pet-mom.club:8080',
+          BASE_ASSETS_PATH: '',
           APP_CONFIG: appConfig
         })
       })
