@@ -128,7 +128,7 @@ module.exports = (env, argv) => {
     resolve: {
       fallback: {
         fs: false,
-        path: require.resolve("path-browserify"),
+        path: require.resolve("path-browserify")
       }
     },
 
@@ -153,8 +153,6 @@ module.exports = (env, argv) => {
       https: createHTTPSConfig(),
       host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
       port: process.env.PORT || "8989",
-      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
-      //FIXME; SOOSKIM ! - useLocalIp: true,
       allowedHosts: 'all',
       headers: {
         "Access-Control-Allow-Origin": "*"
@@ -204,7 +202,6 @@ module.exports = (env, argv) => {
           options: {
             publicPath: "/",
             filename: "assets/js/[name]-[contenthash].js",
-            publicPath: "/",
             inline: "fallback"
           }
         },
