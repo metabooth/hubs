@@ -127,7 +127,7 @@ module.exports = (env, argv) => {
         type: 'https',
         options: createHTTPSConfig(),
       },
-      host: process.env.HOST_IP || "0.0.0.0",
+      host: "0.0.0.0",
       port: process.env.PORT || "8989",
       allowedHosts: ["localhost", "hubs.local", "pet-mom.club", "www.pet-mom.club", "reticulum.pet-mom.club","hubs.pet-mom.club","admin.pet-mom.club","dialog.pet-mom.club"],
       headers: {
