@@ -1,13 +1,13 @@
 {
   "name": "hubs",
   "version": "0.0.1",
-  "description": "Duck-themed multi-user virtual spaces in WebVR. Brandied by lonycell.",
+  "description": "Duck-themed multi-user virtual spaces in WebVR. Branded by lonycell.",
   "main": "src/index.js",
   "license": "MPL-2.0",
   "homepage": "https://github.com/mozilla/hubs#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mozilla/hubs.git"
+    "url": "https://github.com/metabooth/hubs.git"
   },
   "bugs": {
     "url": "https://github.com/mozilla/hubs/issues"
@@ -83,9 +83,9 @@
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@mozillareality/easing-functions": "^0.1.1",
-    "@mozillareality/three-batch-manager": "github:metabooth/three-batch-manager#master",
+    "@metabooth/three-batch-manager": "github:metabooth/three-batch-manager#developers/lonycell/master",
     "@popperjs/core": "^2.11.5",
-    "aframe": "github:metabooth/aframe#hubs/master",
+    "aframe": "github:metabooth/aframe#developers/lonycell/hubs/master",
     "ammo-debug-drawer": "github:infinitelee/ammo-debug-drawer",
     "ammo.js": "github:metabooth/ammo.js#hubs/master",
     "animejs": "github:metabooth/anime#hubs/master",
@@ -144,7 +144,7 @@
     "sdp-transform": "^2.14.1",
     "semver": "^7.3.7",
     "stream": "0.0.2",
-    "three": "github:metabooth/three.js#hubs-patches-133",
+    "three": "github:metabooth/three.js#developers/lonycell/hubs-patches-133-fake-140",
     "three-ammo": "github:infinitelee/three-ammo",
     "three-mesh-bvh": "^0.5.11",
     "three-pathfinding": "^1.1.0",
