@@ -461,19 +461,20 @@ export default async (env, argv) => {
         {
           test: /\.(scss|css)$/,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader
-            },
+            "style-loader",
+            // {
+            //   loader: MiniCssExtractPlugin.loader
+            // },
             {
               loader: "css-loader",
               options: {
                 //TODO; SOOSKIM ! - name: "[path][name]-[hash].[ext]",
                 esModule: false,
                 modules: {
-                  mode: "global",
+                  mode: "local",
                   auto: true,
                   exportGlobals: true,
-                  namedExport: false,
+                  namedExport: true,
                   localIdentName: "[path][name]-[hash]",
                   localIdentContext: path.resolve(__dirname, "src"),
                   exportLocalsConvention: "camelCase",
@@ -481,7 +482,16 @@ export default async (env, argv) => {
                 }
               }
             },
-            "sass-loader"
+            {
+              loader: "sass-loader",
+              options: {
+                api: "legacy",
+                // implementation: require('node-sass'),
+                // sassOptions: {
+                //   // Your sass options
+                // },
+              },
+            },
           ]
         },
         {
