@@ -25,11 +25,11 @@ const {defaultTemplate} = IconTemplate;
 
 //======================================================================
 function createHTTPSConfig() {
-  const certBase = '/home/lonycell/server';
+  const certBase = '/home/lonycell/server/.certs';
 
   if (fs.existsSync(path.join(certBase, ".certs"))) {
-    const key = fs.readFileSync(path.join(certBase, ".certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(certBase, ".certs", "cert.pem"));
+    const key = fs.readFileSync(path.join(certBase, "pet-mom.club", "key.pem"));
+    const cert = fs.readFileSync(path.join(certBase, "pet-mom.club", "cert.pem"));
 
     return { key, cert };
   } else {
