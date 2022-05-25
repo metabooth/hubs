@@ -34,7 +34,7 @@ import { ImportContent } from "./react-components/import-content";
 import { AutoEndSessionDialog } from "./react-components/auto-end-session-dialog";
 import Store from "hubs/src/storage/store";
 import registerTelemetry from "hubs/src/telemetry";
-import { createMuiTheme, withStyles } from "@material-ui/core/styles";
+import { createTheme, withStyles } from "@material-ui/core/styles";
 import { UnauthorizedPage } from "./react-components/unauthorized";
 
 const qs = new URLSearchParams(location.hash.split("?")[1]);
@@ -46,7 +46,7 @@ registerTelemetry("/admin", "Hubs Admin");
 
 let itaSchemas;
 
-const theme = createMuiTheme({
+const theme = createTheme({
   overrides: {
     MuiDrawer: {
       docked: {

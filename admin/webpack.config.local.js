@@ -9,8 +9,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+//==========================================================================================
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
   if (fs.existsSync(path.join(__dirname, "certs"))) {
     const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
     const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
@@ -56,14 +56,15 @@ function createHTTPSConfig() {
   }
 }
 
+//==========================================================================================
 module.exports = (env, argv) => {
   env = env || {};
-
-  // Load environment variables from .env files.
-  // .env takes precedent over .defaults.env
-  // Previously defined environment variables are not overwritten
+ 
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
+
+  const defaultHostName = 'localhost';
+  const host = process.env.HOST_IP || defaultHostName;
 
   if (env.local) {
     Object.assign(process.env, {
@@ -78,7 +79,6 @@ module.exports = (env, argv) => {
     });
   }
 
-  //TODO:
   if (env.dev) {
     const domain = "localhost";
     Object.assign(process.env, {
@@ -109,44 +109,46 @@ module.exports = (env, argv) => {
     });
   }
 
-  const defaultHostName = 'localhost';
-  const host = process.env.HOST_IP || defaultHostName;
-
-  // Remove comments from .babelrc
-  const babelConfig = JSON.parse(
-    fs
+  const babelConfig = JSON.parse(fs
       .readFileSync(path.resolve(__dirname, ".babelrc"))
       .toString()
       .replace(/\/\/.+/g, "")
   );
 
+  //==========================================================================================
   return {
     watch: false,
     node: {
-      // need to specify this manually because some random lodash code will try to access
-      // Buffer on the global object if it exists, so webpack will polyfill on its behalf
-      //Buffer: false,
-      //fs: "empty"
     },
     stats: {
       children: true,
     },
+
+    //==========================================================================================
     resolve: {
       fallback: {
         fs: false,
         path: require.resolve("path-browserify"),
       }
     },
+
+    //==========================================================================================
     entry: {
       admin: path.join(__dirname, "src", "admin.js")
     },
+
+    //==========================================================================================
     output: {
       //TODO: SOOSKIM ! 
       path: path.resolve(__dirname, './dist'),
       filename: "assets/js/[name]-[chunkhash].js",
       publicPath: process.env.BASE_ASSETS_PATH || ""
     },
+
+    //==========================================================================================
     devtool: argv.mode === "production" ? "source-map" : "inline-source-map",
+
+    //==========================================================================================
     devServer: {
       https: createHTTPSConfig(),
       host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
@@ -157,7 +159,6 @@ module.exports = (env, argv) => {
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      //FIXME; SOOSKIM !
       onBeforeSetupMiddleware: function (devServer) {
         if (!devServer) {
           throw new Error('webpack-dev-server is not defined');
@@ -173,27 +174,16 @@ module.exports = (env, argv) => {
           }
         });
       },
-      // before: function(app) {
-      //   // be flexible with people accessing via a local reticulum on another port
-      //   //TODO: SOOSKIM !
-      //   app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
-      //   // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
-      //   app.head("*", function(req, res, next) {
-      //     if (req.method === "HEAD") {
-      //       res.append("Date", new Date().toGMTString());
-      //       res.send("");
-      //     } else {
-      //       next();
-      //     }
-      //   });
-      // }
     },
+
+    //==========================================================================================
     performance: {
-      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
     },
+
+    //==========================================================================================
     module: {
       rules: [
         {
@@ -221,18 +211,30 @@ module.exports = (env, argv) => {
         {
           test: /\.(scss|css)$/,
           use: [
-            {
-              loader: MiniCssExtractPlugin.loader
-            },
+            "style-loader",
             {
               loader: "css-loader",
               options: {
-                name: "[path][name]-[hash].[ext]",
-                localIdentName: "[name]__[local]__[hash:base64:5]",
-                camelCase: true
+                //TODO; SOOSKIM ! - name: "[path][name]-[hash].[ext]",
+                esModule: false,
+                modules: {
+                  mode: "local",
+                  auto: true,
+                  exportGlobals: true,
+                  namedExport: true,
+                  localIdentName: "[path][name]-[hash]",
+                  localIdentContext: path.resolve(__dirname, "src"),
+                  exportLocalsConvention: "camelCase",
+                  exportOnlyLocals: false,
+                }
               }
             },
-            "sass-loader"
+            {
+              loader: "sass-loader",
+              options: {
+                api: "legacy"
+              },
+            },
           ]
         },
         {
@@ -271,6 +273,7 @@ module.exports = (env, argv) => {
         }
       ]
     },
+    //==========================================================================================
     plugins: [
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin({
@@ -287,12 +290,9 @@ module.exports = (env, argv) => {
         favicon: "src/assets/images/favicon.ico",
         inject: "head",
       }),
-      // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
-        disable: argv.mode !== "production"
       }),
-      // Define process.env variables in the browser context.
       new webpack.DefinePlugin({
         "process.env": JSON.stringify({
           NODE_ENV: argv.mode,
@@ -308,4 +308,5 @@ module.exports = (env, argv) => {
       })
     ]
   };
+  //==========================================================================================
 };
