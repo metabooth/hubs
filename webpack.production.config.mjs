@@ -27,7 +27,7 @@ const {defaultTemplate} = IconTemplate;
 function createHTTPSConfig() {
   const certBase = '/home/lonycell/server/.certs';
 
-  if (fs.existsSync(path.join(certBase, ".certs"))) {
+  if (fs.existsSync(path.join(certBase, "pet-mom.club"))) {
     const key = fs.readFileSync(path.join(certBase, "pet-mom.club", "key.pem"));
     const cert = fs.readFileSync(path.join(certBase, "pet-mom.club", "cert.pem"));
 
