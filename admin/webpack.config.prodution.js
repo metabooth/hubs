@@ -22,34 +22,19 @@ module.exports = (env, argv) => {
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
-  if (env.local) {
-    Object.assign(process.env, {
-      HOST: "localhost",
-      RETICULUM_SOCKET_SERVER: "localhost",
-      CORS_PROXY_SERVER: "localhost:4000",
-      NON_CORS_PROXY_DOMAINS: "localhost,dev.reticulum.io",
-      BASE_ASSETS_PATH: "https://localhost:8989/",
-      RETICULUM_SERVER: "localhost:4000",
-      POSTGREST_SERVER: "",
-      ITA_SERVER: ""
-    });
-  }
-
-  //TODO:
-  if (env.prod) {
-    const domain = "www.pet-mom.club";
-    Object.assign(process.env, {
-      HOST: domain,
-      RETICULUM_SOCKET_SERVER: domain,
-      CORS_PROXY_SERVER: domain,
-      NON_CORS_PROXY_DOMAINS: `${domain}`,
-      BASE_ASSETS_PATH: `https://${domain}:8989/`,
-      RETICULUM_SERVER: domain,
-      POSTGREST_SERVER: domain,
-      ITA_SERVER: domain,
-      HOST_IP: domain,
-    });
-  }
+  const domain = "www.pet-mom.club";
+  const port = 8989;
+  Object.assign(process.env, {
+    HOST: domain,
+    RETICULUM_SOCKET_SERVER: domain,
+    CORS_PROXY_SERVER: domain,
+    NON_CORS_PROXY_DOMAINS: `${domain}`,
+    BASE_ASSETS_PATH: `https://${domain}:8989/`,
+    RETICULUM_SERVER: domain,
+    POSTGREST_SERVER: domain,
+    ITA_SERVER: domain,
+    HOST_IP: domain,
+  });
 
   const defaultHostName = 'www.pet-mom.club';
   const host = process.env.HOST_IP || defaultHostName;
@@ -86,23 +71,22 @@ module.exports = (env, argv) => {
       admin: path.join(__dirname, "src", "admin.js")
     },
     output: {
-      //TODO: SOOSKIM ! 
       path: path.resolve(__dirname, './dist'),
       filename: "assets/js/[name]-[chunkhash].js",
       publicPath: process.env.BASE_ASSETS_PATH || ""
     },
     devtool: argv.mode === "production" ? "source-map" : "inline-source-map",
     devServer: {
-      https: createHTTPSConfig(),
-      host: "0.0.0.0", //FIXME; SOOSKIM ! - host: process.env.HOST_IP || "0.0.0.0",
+      server: {
+        type: 'https',
+        options: createHTTPSConfig(),
+      },
+      host: process.env.HOST_IP || "0.0.0.0",
       port: process.env.PORT || "8989",
-      //FIXME; SOOSKIM ! - public: `${host}:${process.env.PORT || "8989"}`,
-      //FIXME; SOOSKIM ! - useLocalIp: true,
       allowedHosts: 'all',
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      //FIXME; SOOSKIM !
       onBeforeSetupMiddleware: function (devServer) {
         if (!devServer) {
           throw new Error('webpack-dev-server is not defined');
@@ -120,7 +104,6 @@ module.exports = (env, argv) => {
       }
     },
     performance: {
-      // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
         return !/\.(map|png|jpg|gif|glb|webm)$/.test(assetFilename);
       }
@@ -182,9 +165,7 @@ module.exports = (env, argv) => {
           use: {
             loader: "file-loader",
             options: {
-              // move required assets to output dir and add a hash for cache busting
               name: "[path][name]-[hash].[ext]",
-              // Make asset paths relative to /src
               context: path.join(__dirname, "src")
             }
           }
@@ -226,17 +207,26 @@ module.exports = (env, argv) => {
       }),
       new webpack.ProvidePlugin({
         "process.env": JSON.stringify({
-          NODE_ENV: argv.mode,
-          BUILD_VERSION: process.env.BUILD_VERSION,
+          NODE_ENV: 'production',
+          SHORTLINK_DOMAIN: process.env.SHORTLINK_DOMAIN,
+          RETICULUM_SERVER: 'www.pet-mom.club:4000',
+          RETICULUM_SOCKET_SERVER: 'www.pet-mom.club:4000',
+          THUMBNAIL_SERVER: 'www.pet-mom.club:8080',
+          CORS_PROXY_SERVER: 'www.pet-mom.club:8080',
+          NON_CORS_PROXY_DOMAINS: 'pet-mom.club',
+          BUILD_VERSION: '1.0.0',
+          SENTRY_DSN: process.env.SENTRY_DSN,
+          GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+          POSTGREST_SERVER: 'www.pet-mom.club:3001',
+          UPLOADS_HOST: 'www.pet-mom.club:8080',
+          BASE_ASSETS_PATH: '',
           CONFIGURABLE_SERVICES: process.env.CONFIGURABLE_SERVICES,
-          ITA_SERVER: process.env.ITA_SERVER,
-          RETICULUM_SERVER: process.env.RETICULUM_SERVER,
-          CORS_PROXY_SERVER: process.env.CORS_PROXY_SERVER,
-          POSTGREST_SERVER: process.env.POSTGREST_SERVER,
-          UPLOADS_HOST: process.env.UPLOADS_HOST,
-          BASE_ASSETS_PATH: process.env.BASE_ASSETS_PATH
+          ITA_SERVER: process.env.ITA_SERVER
         })
       })
     ]
   };
 };
+
+
+

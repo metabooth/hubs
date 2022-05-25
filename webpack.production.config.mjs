@@ -313,7 +313,10 @@ export default async (env, argv) => {
     },
     devtool: "source-map",
     devServer: {
-      https: createHTTPSConfig(),
+      server: {
+        type: 'https',
+        options: createHTTPSConfig(),
+      },
       host: "0.0.0.0",
       allowedHosts: [host, "localhost", "hubs.local", "pet-mom.club", "www.pet-mom.club", "reticulum.pet-mom.club","hubs.pet-mom.club","admin.pet-mom.club","dialog.pet-mom.club"],
       headers: devServerHeaders,
