@@ -129,9 +129,8 @@ module.exports = (env, argv) => {
       fallback: {
         fs: false,
         path: require.resolve("path-browserify")
-      }
+      },
     },
-
     //==========================================================================================
     entry: {
       admin: path.join(__dirname, "src", "admin.js")
