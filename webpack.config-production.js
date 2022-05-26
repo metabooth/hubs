@@ -519,8 +519,22 @@ module.exports = async (env, argv) => {
         },
         {
           test: /\.webmanifest$/i,
-          use: 'webpack-webmanifest-loader',
-          type: 'asset/resource',
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]'
+              }
+            },
+            {
+              loader: 'webmanifest-loader',
+              options: {
+                name: '메타허브',
+                shortName: '메타허브',
+                description: '메타허브'
+              }
+            }
+          ]
         },
       ]
     },
