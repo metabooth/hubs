@@ -115,7 +115,9 @@ module.exports = (env, argv) => {
       },
       before: function(app) {
         // be flexible with people accessing via a local reticulum on another port
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        // TODO
+        // app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
