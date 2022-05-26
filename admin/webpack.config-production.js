@@ -9,10 +9,11 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+  const certBase = '/home/lonycell/server/.certs';
+
+  if (fs.existsSync(path.join(certBase, "pet-mom.club"))) {
+    const key = fs.readFileSync(path.join(certBase, "pet-mom.club", "key.pem"));
+    const cert = fs.readFileSync(path.join(certBase, "pet-mom.club", "cert.pem"));
 
     return { key, cert };
   } else {
@@ -44,9 +45,11 @@ function createHTTPSConfig() {
       }
     );
 
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+    if (!fs.existsSync(path.join(__dirname, "certs"))) {
+      fs.mkdirSync(path.join(__dirname, "certs"));
+      fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
+      fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+    }
 
     return {
       key: pems.private,
