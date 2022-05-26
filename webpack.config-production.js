@@ -15,10 +15,11 @@ const request = require("request");
 const internalIp = require("internal-ip");
 
 function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
+  const certBase = '/home/lonycell/server/.certs';
+
+  if (fs.existsSync(path.join(certBase, "pet-mom.club"))) {
+    const key = fs.readFileSync(path.join(certBase, "pet-mom.club", "key.pem"));
+    const cert = fs.readFileSync(path.join(certBase, "pet-mom.club", "cert.pem"));
 
     return { key, cert };
   } else {
@@ -51,9 +52,11 @@ function createHTTPSConfig() {
       }
     );
 
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+    if (!fs.existsSync(path.join(__dirname, "certs"))) {
+      fs.mkdirSync(path.join(__dirname, "certs"));
+      fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
+      fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
+    }
 
     return {
       key: pems.private,
@@ -164,8 +167,8 @@ async function fetchAppConfigAndEnvironmentVars() {
 
   const appConfig = await appConfigsResponse.json();
 
-  // dev.reticulum.io doesn't run ita
-  if (host === "dev.reticulum.io") {
+  // www.pet-mom.club doesn't run ita
+  if (host === "www.pet-mom.club") {
     return appConfig;
   }
 
@@ -185,7 +188,7 @@ async function fetchAppConfigAndEnvironmentVars() {
   process.env.SHORTLINK_DOMAIN = shortlink_domain;
   process.env.CORS_PROXY_SERVER = `${localIp}:8080/cors-proxy`;
   process.env.THUMBNAIL_SERVER = thumbnail_server;
-  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},hubs.local,localhost`;
+  process.env.NON_CORS_PROXY_DOMAINS = `${localIp},hubs.local,localhost,www.pet-mom.club`;
 
   return appConfig;
 }
@@ -226,7 +229,7 @@ module.exports = async (env, argv) => {
     if (env.loadAppConfig || process.env.LOAD_APP_CONFIG) {
       if (!env.localDev) {
         // Load and set the app config and environment variables from the remote server.
-        // A Hubs Cloud server or dev.reticulum.io can be used.
+        // A Hubs Cloud server or www.pet-mom.club can be used.
         appConfig = await fetchAppConfigAndEnvironmentVars();
       }
     } else {
@@ -243,7 +246,7 @@ module.exports = async (env, argv) => {
         HOST: localDevHost,
         RETICULUM_SOCKET_SERVER: localDevHost,
         CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-        NON_CORS_PROXY_DOMAINS: `${localDevHost},dev.reticulum.io`,
+        NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
         BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
         RETICULUM_SERVER: `${localDevHost}:4000`,
         POSTGREST_SERVER: "",
@@ -344,7 +347,7 @@ module.exports = async (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://localhost:8080/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
