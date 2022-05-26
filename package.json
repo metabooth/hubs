@@ -18,6 +18,7 @@
     "dev": "webpack-dev-server --mode=development --env.remoteDev",
     "local": "webpack-dev-server --mode=development --env.localDev",
     "build": "rimraf ./dist && webpack --mode=production",
+    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config-production.js",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",
     "doc": "node ./scripts/doc/build.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
