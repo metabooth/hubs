@@ -77,7 +77,8 @@ export async function getReticulumMeta() {
         phx_host: document.querySelector("meta[name='ret:phx_host']").getAttribute("value")
       };
     } else {
-      await fetch(getReticulumFetchUrl("/api/v1/meta")).then(async res => {
+      //TODO: CORS
+      await fetch(getReticulumFetchUrl("/api/v1/meta", {mode:'no-cors'})).then(async res => {
         reticulumMeta = await res.json();
       });
     }
