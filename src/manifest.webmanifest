@@ -1,0 +1,10 @@
+{
+    "name": "메타허브",
+    "icons": [
+        {
+            "src": "./assets/images/hmc-logo.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }
+    ]
+}

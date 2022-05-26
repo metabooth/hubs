@@ -218,6 +218,7 @@
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14",
+    "webpack-webmanifest-loader": "^2.0.2",
     "worker-loader": "^2.0.0"
   },
   "optionalDependencies": {

@@ -516,7 +516,12 @@ module.exports = async (env, argv) => {
         {
           test: /\.(glsl|frag|vert)$/,
           use: { loader: "raw-loader" }
-        }
+        },
+        {
+          test: /\.webmanifest$/i,
+          use: 'webpack-webmanifest-loader',
+          type: 'asset/resource',
+        },
       ]
     },
 
