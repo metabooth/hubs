@@ -62,7 +62,7 @@ function createHTTPSConfig() {
       }
     );
 
-    fs.mkdirSync(path.join(__dirname, "certs"));
+    //fs.mkdirSync(path.join(__dirname, "certs"));
     fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
     fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
 
@@ -453,10 +453,10 @@ export default async (env, argv) => {
         {
           test: /\.(scss|css)$/,
           use: [
-            "style-loader",
-            // {
-            //   loader: MiniCssExtractPlugin.loader
-            // },
+            //"style-loader",
+            {
+              loader: MiniCssExtractPlugin.loader
+            },
             {
               loader: "css-loader",
               options: {

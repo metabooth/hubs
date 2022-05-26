@@ -47,7 +47,7 @@ function createHTTPSConfig() {
       }
     );
 
-    fs.mkdirSync(path.join(__dirname, "certs"));
+    //fs.mkdirSync(path.join(__dirname, "certs"));
     fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
     fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
 
