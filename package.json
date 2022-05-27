@@ -13,12 +13,13 @@
     "url": "https://github.com/mozilla/hubs/issues"
   },
   "scripts": {
+    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config-production.js",
+    "start:prod": "rimraf ./dist && webpack-dev-server --mode=production --config webpack.config-production.js",
     "info": "npm-scripts-info",
     "start": "webpack-dev-server --mode=development --env.loadAppConfig",
     "dev": "webpack-dev-server --mode=development --env.remoteDev",
     "local": "webpack-dev-server --mode=development --env.localDev",
     "build": "rimraf ./dist && webpack --mode=production",
-    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config-production.js",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",
     "doc": "node ./scripts/doc/build.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
@@ -67,7 +68,7 @@
     ]
   },
   "dependencies": {
-    "@braintree/sanitize-url": "^5.0.0",
+    "@braintree/sanitize-url": "^6.0.0",
     "@formatjs/intl-locale": "^2.4.13",
     "@formatjs/intl-pluralrules": "^4.0.3",
     "@formatjs/intl-relativetimeformat": "^8.0.1",
@@ -81,7 +82,7 @@
     "ammo-debug-drawer": "github:infinitelee/ammo-debug-drawer",
     "ammo.js": "github:mozillareality/ammo.js#hubs/master",
     "animejs": "github:mozillareality/anime#hubs/master",
-    "buffered-interpolation": "github:Infinitelee/buffered-interpolation",
+    "buffered-interpolation": "github:InfiniteLee/buffered-interpolation",
     "classnames": "^2.2.5",
     "color": "^3.1.2",
     "copy-to-clipboard": "^3.0.8",
