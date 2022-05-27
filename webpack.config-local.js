@@ -213,25 +213,53 @@ function htmlPagePlugin({ filename, extraChunks = [], chunksSortMode, inject }) 
 module.exports = async (env, argv) => {
   env = env || {};
 
+  // Load environment variables from .env files.
+  // .env takes precedent over .defaults.env
+  // Previously defined environment variables are not overwritten
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
   let appConfig = undefined;
 
-  const localDevHost = "www.pet-mom.club";
-  Object.assign(process.env, {
-    HOST: localDevHost,
-    RETICULUM_SOCKET_SERVER: localDevHost,
-    CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
-    BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-    RETICULUM_SERVER: `${localDevHost}:4000`,
-    POSTGREST_SERVER: "",
-    ITA_SERVER: "",
-    UPLOADS_HOST: `https://${localDevHost}:4000`
-  });
+  /**
+   * Initialize the Webpack build envrionment for the provided environment.
+   */
 
-  const host = process.env.HOST_IP || "www.pet-mom.club";
+  if (argv.mode !== "production" || env.bundleAnalyzer) {
+    if (env.loadAppConfig || process.env.LOAD_APP_CONFIG) {
+      if (!env.localDev) {
+        // Load and set the app config and environment variables from the remote server.
+        // A Hubs Cloud server or www.pet-mom.club can be used.
+        appConfig = await fetchAppConfigAndEnvironmentVars();
+      }
+    } else {
+      if (!env.localDev) {
+        // Use the default app config with all features enabled.
+        appConfig = createDefaultAppConfig();
+      }
+    }
+
+    if (env.localDev) {
+      const localDevHost = "hubs.local";
+      // Local Dev Environment (npm run local)
+      Object.assign(process.env, {
+        HOST: localDevHost,
+        RETICULUM_SOCKET_SERVER: localDevHost,
+        CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+        NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
+        BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
+        RETICULUM_SERVER: `${localDevHost}:4000`,
+        POSTGREST_SERVER: "",
+        ITA_SERVER: "",
+        UPLOADS_HOST: `https://${localDevHost}:4000`
+      });
+    }
+  }
+
+  // In production, the environment variables are defined in CI or loaded from ita and
+  // the app config is injected into the head of the page by Reticulum.
+
+  const host = process.env.HOST_IP || env.localDev || env.remoteDev ? "hubs.local" : "localhost";
 
   const liveReload = !!process.env.LIVE_RELOAD || false;
 
@@ -249,14 +277,18 @@ module.exports = async (env, argv) => {
     "Access-Control-Allow-Origin": "*"
   };
 
+  // Behind and environment var for now pending further testing
   if (process.env.DEV_CSP_SOURCE) {
     const CSPResp = await fetch(`https://${process.env.DEV_CSP_SOURCE}/`);
     const remoteCSP = CSPResp.headers.get("content-security-policy");
     devServerHeaders["content-security-policy"] = remoteCSP;
+    // .replaceAll("connect-src", "connect-src https://example.com");
   }
 
   return {
     node: {
+      // need to specify this manually because some random lodash code will try to access
+      // Buffer on the global object if it exists, so webpack will polyfill on its behalf
       Buffer: false,
       fs: "empty"
     },
@@ -285,7 +317,7 @@ module.exports = async (env, argv) => {
       host: "0.0.0.0",
       public: `${host}:8080`,
       useLocalIp: true,
-      allowedHosts: [host, "*"],
+      allowedHosts: [host, "hubs.local"],
       headers: devServerHeaders,
       hot: liveReload,
       inline: liveReload,
@@ -300,6 +332,7 @@ module.exports = async (env, argv) => {
         ]
       },
       before: function(app) {
+        // Local CORS proxy
         app.all("/cors-proxy/*", (req, res) => {
           res.header("Access-Control-Allow-Origin", "*");
           res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
@@ -330,7 +363,9 @@ module.exports = async (env, argv) => {
           }
         });
 
-        app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
+        // be flexible with people accessing via a local reticulum on another port
+        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+        // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
@@ -375,6 +410,7 @@ module.exports = async (env, argv) => {
           loader: "babel-loader",
           options: legacyBabelConfig
         },
+        // Some JS assets are loaded at runtime and should be coppied unmodified and loaded using file-loader
         {
           test: [
             path.resolve(__dirname, "node_modules", "three", "examples", "js", "libs", "basis", "basis_transcoder.js"),
@@ -410,6 +446,7 @@ module.exports = async (env, argv) => {
         {
           test: /\.js$/,
           include: [path.resolve(__dirname, "src")],
+          // Exclude JS assets in node_modules because they are already transformed and often big.
           exclude: [path.resolve(__dirname, "node_modules")],
           loader: "babel-loader"
         },
@@ -458,7 +495,9 @@ module.exports = async (env, argv) => {
           use: {
             loader: "file-loader",
             options: {
+              // move required assets to output dir and add a hash for cache busting
               name: "[path][name]-[hash].[ext]",
+              // Make asset paths relative to /src
               context: path.join(__dirname, "src")
             }
           }
@@ -547,6 +586,7 @@ module.exports = async (env, argv) => {
       new BundleAnalyzerPlugin({
         analyzerMode: env && env.bundleAnalyzer ? "server" : "disabled"
       }),
+      // Each output page needs a HTMLWebpackPlugin entry
       htmlPagePlugin({
         filename: "index.html",
         extraChunks: ["support"],
@@ -613,13 +653,15 @@ module.exports = async (env, argv) => {
           to: "manifest.webmanifest"
         }
       ]),
+      // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
-        disable: false
+        disable: argv.mode !== "production"
       }),
+      // Define process.env variables in the browser context.
       new webpack.DefinePlugin({
         "process.env": JSON.stringify({
-          NODE_ENV: "production",
+          NODE_ENV: argv.mode,
           SHORTLINK_DOMAIN: process.env.SHORTLINK_DOMAIN,
           RETICULUM_SERVER: process.env.RETICULUM_SERVER,
           RETICULUM_SOCKET_SERVER: process.env.RETICULUM_SOCKET_SERVER,
