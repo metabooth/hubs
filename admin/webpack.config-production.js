@@ -118,10 +118,37 @@ module.exports = (env, argv) => {
         "Access-Control-Allow-Origin": "*"
       },
       before: function(app) {
-        // be flexible with people accessing via a local reticulum on another port
-        // FIXME
+        app.all("/cors-proxy/*", (req, res) => {
+          res.header("Access-Control-Allow-Origin", "*");
+          res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+          res.header("Access-Control-Allow-Headers", "Range");
+          res.header(
+            "Access-Control-Expose-Headers",
+            "Accept-Ranges, Content-Encoding, Content-Length, Content-Range, Hub-Name, Hub-Entity-Type"
+          );
+          res.header("Vary", "Origin");
+          res.header("X-Content-Type-Options", "nosniff");
+
+          const redirectLocation = req.header("location");
+
+          if (redirectLocation) {
+            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
+          }
+
+          if (req.method === "OPTIONS") {
+            res.send();
+          } else {
+            const url = req.originalUrl.replace("/cors-proxy/", "");
+            request({ url, method: req.method }, error => {
+              if (error) {
+                console.error(`cors-proxy: error fetching "${url}"\n`, error);
+                return;
+              }
+            }).pipe(res);
+          }
+        });
+
         app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
-        // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
             res.append("Date", new Date().toGMTString());
@@ -130,8 +157,7 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      }
-    },
+      },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
