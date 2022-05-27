@@ -68,16 +68,20 @@ module.exports = (env, argv) => {
   dotenv.config({ path: ".defaults.env" });
 
   const localDevHost = "www.pet-mom.club";
+
   Object.assign(process.env, {
     HOST: localDevHost,
     RETICULUM_SOCKET_SERVER: localDevHost,
-    CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
-    BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-    RETICULUM_SERVER: `${localDevHost}:4000`,
+    //CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+    CORS_PROXY_SERVER: `${localDevHost}`,
+    NON_CORS_PROXY_DOMAINS: `${localDevHost}`,
+    BASE_ASSETS_PATH: ``,
+    //RETICULUM_SERVER: `${localDevHost}:4000`,
+    RETICULUM_SERVER: `${localDevHost}`,
     POSTGREST_SERVER: "",
     ITA_SERVER: "",
-    UPLOADS_HOST: `https://${localDevHost}:4000`
+    //UPLOADS_HOST: `https://${localDevHost}:4000`
+    UPLOADS_HOST: `${localDevHost}`
   });
 
   const host = process.env.HOST_IP || "www.pet-mom.club";
