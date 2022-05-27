@@ -157,7 +157,8 @@ module.exports = (env, argv) => {
             next();
           }
         });
-      },
+      }
+    },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
       assetFilter(assetFilename) {
