@@ -77,7 +77,7 @@ module.exports = (env, argv) => {
     NON_CORS_PROXY_DOMAINS: `${localDevHost}, https://www.pet-mom.club:8080, https://www.pet-mom.club:8989`,
     BASE_ASSETS_PATH: `https://${localDevHost}:8989/`,
     //RETICULUM_SERVER: `${localDevHost}:4000`,
-    RETICULUM_SERVER: `${localDevHost}`,
+    RETICULUM_SERVER: `${localDevHost}:4000`,
     POSTGREST_SERVER: "",
     ITA_SERVER: "",
     //UPLOADS_HOST: `https://${localDevHost}:4000`
