@@ -73,7 +73,7 @@ module.exports = (env, argv) => {
     HOST: localDevHost,
     RETICULUM_SOCKET_SERVER: localDevHost,
     //CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    CORS_PROXY_SERVER: `${localDevHost}`,
+    CORS_PROXY_SERVER: `${localDevHost}:8989/`,
     NON_CORS_PROXY_DOMAINS: `${localDevHost}, https://www.pet-mom.club:8080, https://www.pet-mom.club:8989`,
     BASE_ASSETS_PATH: `https://${localDevHost}:8989/`,
     //RETICULUM_SERVER: `${localDevHost}:4000`,
@@ -132,7 +132,7 @@ module.exports = (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://www.pet-mom.club:8080/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://www.pet-mom.club:8989/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
