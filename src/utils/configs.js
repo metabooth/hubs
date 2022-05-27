@@ -84,7 +84,8 @@ configs.feature = featureName => {
 };
 
 let localDevImages = {};
-if (isLocalDevelopment) {
+//FIXME
+//if (isLocalDevelopment) {
   localDevImages = {
     logo: appLogo,
     logo_dark: appLogoDark,
@@ -92,7 +93,7 @@ if (isLocalDevelopment) {
     editor_logo: sceneEditorLogo,
     home_background: homeHeroBackground
   };
-}
+//}
 
 configs.image = (imageName, cssUrl) => {
   const url =
