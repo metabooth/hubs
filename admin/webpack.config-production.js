@@ -72,15 +72,17 @@ module.exports = (env, argv) => {
   Object.assign(process.env, {
     HOST: localDevHost,
     RETICULUM_SOCKET_SERVER: localDevHost,
-    //CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    CORS_PROXY_SERVER: `${localDevHost}:8989/`,
+    //FIXME CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+    //FIXME CORS_PROXY_SERVER: `${localDevHost}:8989/`,
+    CORS_PROXY_SERVER: ``,
     NON_CORS_PROXY_DOMAINS: `${localDevHost}, https://www.pet-mom.club:8080, https://www.pet-mom.club:8989`,
     BASE_ASSETS_PATH: `https://${localDevHost}:8989/`,
-    //RETICULUM_SERVER: `${localDevHost}:4000`,
+    //FIXME RETICULUM_SERVER: `${localDevHost}:4000`,
     RETICULUM_SERVER: `${localDevHost}:4000`,
-    POSTGREST_SERVER: "",
+    //FIXME POSTGREST_SERVER: ``,
+    POSTGREST_SERVER: `${localDevHost}:3001`,
     ITA_SERVER: "",
-    //UPLOADS_HOST: `https://${localDevHost}:4000`
+    //FIXME UPLOADS_HOST: `https://${localDevHost}:4000`
     UPLOADS_HOST: `${localDevHost}`
   });
 
