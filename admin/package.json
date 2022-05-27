@@ -9,11 +9,12 @@
     "url": "https://github.com/mozilla/hubs.git"
   },
   "scripts": {
+    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config-production.js",
+    "start:prod": "rimraf ./dist && webpack-dev-server --mode=production --config webpack.config-production.js",
     "start": "webpack-dev-server --mode=development --env.hubsCloudDev",
     "dev": "webpack-dev-server --mode=development --env.dev",
     "local": "webpack-dev-server --mode=development --env.local",
     "build": "rimraf ./dist && webpack --mode=production",
-    "build:prod": "rimraf ./dist && webpack --mode=production --config webpack.config-production.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
     "lint:js": "eslint '*.js' 'src/**/*.js'",
     "lint:html": "htmlhint 'src/**/*.html'",

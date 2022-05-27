@@ -67,20 +67,21 @@ module.exports = (env, argv) => {
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
-  const localDevHost = "www.pet-mom.club";
-  Object.assign(process.env, {
-    HOST: localDevHost,
-    RETICULUM_SOCKET_SERVER: localDevHost,
-    CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
-    BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-    RETICULUM_SERVER: `${localDevHost}:4000`,
-    POSTGREST_SERVER: "",
-    ITA_SERVER: "",
-    UPLOADS_HOST: `https://${localDevHost}:4000`
-  });
+  if (env.local) {
+    Object.assign(process.env, {
+      HOST: "hubs.local",
+      RETICULUM_SOCKET_SERVER: "hubs.local",
+      CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+      NON_CORS_PROXY_DOMAINS: "hubs.local,dev.reticulum.io",
+      BASE_ASSETS_PATH: "https://hubs.local:8989/",
+      RETICULUM_SERVER: "hubs.local:4000",
+      POSTGREST_SERVER: "",
+      ITA_SERVER: ""
+    });
+  }
 
-  const host = process.env.HOST_IP || "www.pet-mom.club";
+  const defaultHostName = "hubs.local";
+  const host = process.env.HOST_IP || defaultHostName;
 
   // Remove comments from .babelrc
   const babelConfig = JSON.parse(
@@ -114,8 +115,9 @@ module.exports = (env, argv) => {
       },
       before: function(app) {
         // be flexible with people accessing via a local reticulum on another port
-        // FIXME
-        app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
+        // TODO
+        // app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
+
         // networked-aframe makes HEAD requests to the server for time syncing. Respond with an empty body.
         app.head("*", function(req, res, next) {
           if (req.method === "HEAD") {
@@ -182,7 +184,9 @@ module.exports = (env, argv) => {
           use: {
             loader: "file-loader",
             options: {
+              // move required assets to output dir and add a hash for cache busting
               name: "[path][name]-[hash].[ext]",
+              // Make asset paths relative to /src
               context: path.join(__dirname, "src")
             }
           }
@@ -211,10 +215,12 @@ module.exports = (env, argv) => {
           to: "favicon.ico"
         }
       ]),
+      // Extract required css and add a content hash.
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
         disable: argv.mode !== "production"
       }),
+      // Define process.env variables in the browser context.
       new webpack.DefinePlugin({
         "process.env": JSON.stringify({
           NODE_ENV: argv.mode,
