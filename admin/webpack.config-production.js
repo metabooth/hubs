@@ -75,7 +75,7 @@ module.exports = (env, argv) => {
     //CORS_PROXY_SERVER: "hubs-proxy.local:4000",
     CORS_PROXY_SERVER: `${localDevHost}`,
     NON_CORS_PROXY_DOMAINS: `${localDevHost}`,
-    BASE_ASSETS_PATH: `${localDevHost}:8989`,
+    BASE_ASSETS_PATH: `https://${localDevHost}:8989`,
     //RETICULUM_SERVER: `${localDevHost}:4000`,
     RETICULUM_SERVER: `${localDevHost}`,
     POSTGREST_SERVER: "",
