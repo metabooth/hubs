@@ -13,6 +13,7 @@ async function checkIsAdmin(socket, store) {
   // TODO: Doing all of this just to determine if the user is an admin seems unnecessary. The auth callback should have the isAdmin flag.
   const retPhxChannel = socket.channel("ret", { hub_id: "index", token: store.state.credentials.token });
 
+  //FIXME: SOOSKIM - postgrest !
   const perms = await new Promise(resolve => {
     retPhxChannel
       .join()

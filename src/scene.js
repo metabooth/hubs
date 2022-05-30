@@ -95,6 +95,7 @@ const onReady = async () => {
 
     const retPhxChannel = socket.channel("ret", joinParams);
 
+    //FIXME: SOOSKIM - postgrest !
     retPhxChannel.join().receive("ok", () => {
       retPhxChannel.push("refresh_perms_token").receive("ok", ({ perms_token }) => {
         const perms = jwtDecode(perms_token);

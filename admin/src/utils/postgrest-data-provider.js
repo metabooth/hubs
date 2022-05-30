@@ -277,6 +277,7 @@ const setAuthToken = function(token) {
   currentAuthToken = token;
 };
 
+//FIXME: SOOSKIM - postgrest !
 export const refreshPermsToken = function() {
   return new Promise((resolve, reject) => {
     retPhxChannel

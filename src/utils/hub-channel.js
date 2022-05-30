@@ -408,6 +408,7 @@ export default class HubChannel extends EventTarget {
     this.channel.push("unpin", payload);
   };
 
+  //FIXME: SOOSKIM - postgrest !
   fetchPermissions = () => {
     return new Promise((resolve, reject) => {
       this.channel
