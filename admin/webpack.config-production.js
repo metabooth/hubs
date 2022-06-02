@@ -69,28 +69,18 @@ module.exports = (env, argv) => {
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    //FIXME CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    //FIXME CORS_PROXY_SERVER: `${mainHost}/cors-proxy`,
-    //FIXME CORS_PROXY_SERVER: `${mainHost}`,
-    //FIXME CORS_PROXY_SERVER: ``,
     CORS_PROXY_SERVER: `https://${mainHost}:8989`,
-    //FIXME NON_CORS_PROXY_DOMAINS: `${mainHost}, https://${mainHost}, https://${mainHost}:8080, https://${mainHost}:8989, https://${mainHost}:9090 https://raw.githubusercontent.com`,
     NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
-    //FIXME BASE_ASSETS_PATH: `https://${mainHost}:8989/`,
-    //FIXME BASE_ASSETS_PATH: `https://${mainHost}/`,
     BASE_ASSETS_PATH: `/admin-origin/`,
     RETICULUM_SERVER: `${mainHost}`,
-    //FIXME RETICULUM_SERVER: `${mainHost}:4000`,
-    //FIXME POSTGREST_SERVER: `${mainHost}:3001`,
     POSTGREST_SERVER: ``,
-    ITA_SERVER: "",
-    //FIXME UPLOADS_HOST: `https://${mainHost}:4000`
+    ITA_SERVER: ``,
     UPLOADS_HOST: `${mainHost}`
   });
 
   const host = process.env.HOST_IP || "www.pet-mom.club";
+  const port = process.env.HOST_PORT || "8989";
 
-  // Remove comments from .babelrc
   const babelConfig = JSON.parse(
     fs
       .readFileSync(path.resolve(__dirname, ".babelrc"))
@@ -113,9 +103,9 @@ module.exports = (env, argv) => {
     devServer: {
       https: createHTTPSConfig(),
       host: "0.0.0.0",
-      public: `${host}:8989`,
+      public: `${host}:${port}`,
       useLocalIp: true,
-      allowedHosts: [host, "*"],
+      allowedHosts: [`${host}`, "*"],
       static: './dist',
       useLocalIp: true,
       headers: {
@@ -136,7 +126,7 @@ module.exports = (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://www.pet-mom.club:8989/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://${host}:${port}/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {
