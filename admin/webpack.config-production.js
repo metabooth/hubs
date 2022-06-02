@@ -136,7 +136,7 @@ module.exports = (env, argv) => {
           const redirectLocation = req.header("location");
 
           if (redirectLocation) {
-            res.header("Location", "https://www.pet-mom.club/cors-proxy/" + redirectLocation);
+            res.header("Location", "https://www.pet-mom.club:8989/cors-proxy/" + redirectLocation);
           }
 
           if (req.method === "OPTIONS") {

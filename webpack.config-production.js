@@ -218,17 +218,29 @@ module.exports = async (env, argv) => {
 
   let appConfig = undefined;
 
-  const localDevHost = "www.pet-mom.club";
+  const mainHost = "www.pet-mom.club";
+
+  // Object.assign(process.env, {
+  //   HOST: mainHost,
+  //   RETICULUM_SOCKET_SERVER: mainHost,
+  //   CORS_PROXY_SERVER: "hubs-proxy.local:4000",
+  //   NON_CORS_PROXY_DOMAINS: `${mainHost},www.pet-mom.club`,
+  //   BASE_ASSETS_PATH: `https://${mainHost}:8080/`,
+  //   RETICULUM_SERVER: `${mainHost}:4000`,
+  //   POSTGREST_SERVER: "",
+  //   ITA_SERVER: "",
+  //   UPLOADS_HOST: `https://${mainHost}:4000`
+  // });
   Object.assign(process.env, {
-    HOST: localDevHost,
-    RETICULUM_SOCKET_SERVER: localDevHost,
-    CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    NON_CORS_PROXY_DOMAINS: `${localDevHost},www.pet-mom.club`,
-    BASE_ASSETS_PATH: `https://${localDevHost}:8080/`,
-    RETICULUM_SERVER: `${localDevHost}:4000`,
-    POSTGREST_SERVER: "",
+    HOST: mainHost,
+    RETICULUM_SOCKET_SERVER: mainHost,
+    CORS_PROXY_SERVER: `https://${mainHost}:8080`,
+    NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
+    BASE_ASSETS_PATH: `hubs-origin/`,
+    RETICULUM_SERVER: `${mainHost}`,
+    POSTGREST_SERVER: ``,
     ITA_SERVER: "",
-    UPLOADS_HOST: `https://${localDevHost}:4000`
+    UPLOADS_HOST: `${mainHost}`
   });
 
   const host = process.env.HOST_IP || "www.pet-mom.club";
