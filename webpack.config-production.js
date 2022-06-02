@@ -619,12 +619,12 @@ module.exports = async (env, argv) => {
           to: "schema.toml"
         }
       ]),
-      new CopyWebpackPlugin([
-        {
-          from: "src/manifest.webmanifest",
-          to: "manifest.webmanifest"
-        }
-      ]),
+      // new CopyWebpackPlugin([
+      //   {
+      //     from: "src/manifest.webmanifest",
+      //     to: "manifest.webmanifest"
+      //   }
+      // ]),
       new MiniCssExtractPlugin({
         filename: "assets/stylesheets/[name]-[contenthash].css",
         disable: false
