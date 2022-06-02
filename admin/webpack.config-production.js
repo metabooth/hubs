@@ -75,7 +75,7 @@ module.exports = (env, argv) => {
     //FIXME CORS_PROXY_SERVER: ``,
     CORS_PROXY_SERVER: `hubs-proxy.com`,
     //FIXME NON_CORS_PROXY_DOMAINS: `${mainHost}, https://${mainHost}, https://${mainHost}:8080, https://${mainHost}:8989, https://${mainHost}:9090 https://raw.githubusercontent.com`,
-    NON_CORS_PROXY_DOMAINS: `${mainHost}, raw.githubusercontent.com, hubs-proxy.com, raw.githubusercontent.com`,
+    NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
     //FIXME BASE_ASSETS_PATH: `https://${mainHost}:8989/`,
     //FIXME BASE_ASSETS_PATH: `https://${mainHost}/`,
     BASE_ASSETS_PATH: `admin-origin/`,
