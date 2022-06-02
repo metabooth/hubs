@@ -236,7 +236,7 @@ module.exports = async (env, argv) => {
     RETICULUM_SOCKET_SERVER: mainHost,
     CORS_PROXY_SERVER: `https://${mainHost}:8080`,
     NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
-    BASE_ASSETS_PATH: `hubs-origin/`,
+    BASE_ASSETS_PATH: `/hubs-origin/`,
     RETICULUM_SERVER: `${mainHost}`,
     POSTGREST_SERVER: ``,
     ITA_SERVER: "",
