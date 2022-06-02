@@ -73,7 +73,7 @@ module.exports = (env, argv) => {
     HOST: localDevHost,
     RETICULUM_SOCKET_SERVER: localDevHost,
     //FIXME CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    CORS_PROXY_SERVER: `${localDevHost}:8989/`,
+    CORS_PROXY_SERVER: `${localDevHost}:8989/cors-proxy/`,
     //FIXME CORS_PROXY_SERVER: ``,
     NON_CORS_PROXY_DOMAINS: `${localDevHost}, https://${localDevHost}, https://${localDevHost}:8080, https://${localDevHost}:8989, https://${localDevHost}:9090 https://raw.githubusercontent.com/`,
     //FIXME BASE_ASSETS_PATH: `https://${localDevHost}:8989/`,
