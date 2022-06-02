@@ -61,31 +61,29 @@ function createHTTPSConfig() {
 module.exports = (env, argv) => {
   env = env || {};
 
-  // Load environment variables from .env files.
-  // .env takes precedent over .defaults.env
-  // Previously defined environment variables are not overwritten
   dotenv.config({ path: ".env" });
   dotenv.config({ path: ".defaults.env" });
 
-  const localDevHost = "www.pet-mom.club";
+  const mainHost = "www.pet-mom.club";
 
   Object.assign(process.env, {
-    HOST: localDevHost,
-    RETICULUM_SOCKET_SERVER: localDevHost,
+    HOST: mainHost,
+    RETICULUM_SOCKET_SERVER: mainHost,
     //FIXME CORS_PROXY_SERVER: "hubs-proxy.local:4000",
-    CORS_PROXY_SERVER: `${localDevHost}/cors-proxy`,
+    //CORS_PROXY_SERVER: `${mainHost}/cors-proxy`,
+    CORS_PROXY_SERVER: `${mainHost}`,
     //FIXME CORS_PROXY_SERVER: ``,
-    NON_CORS_PROXY_DOMAINS: `${localDevHost}, https://${localDevHost}, https://${localDevHost}:8080, https://${localDevHost}:8989, https://${localDevHost}:9090 https://raw.githubusercontent.com/`,
-    //FIXME BASE_ASSETS_PATH: `https://${localDevHost}:8989/`,
-    //FIXME BASE_ASSETS_PATH: `https://${localDevHost}/`,
+    NON_CORS_PROXY_DOMAINS: `${mainHost}, https://${mainHost}, https://${mainHost}:8080, https://${mainHost}:8989, https://${mainHost}:9090 https://raw.githubusercontent.com/`,
+    //FIXME BASE_ASSETS_PATH: `https://${mainHost}:8989/`,
+    //FIXME BASE_ASSETS_PATH: `https://${mainHost}/`,
     BASE_ASSETS_PATH: `admin-origin/`,
-    RETICULUM_SERVER: `${localDevHost}`,
-    //FIXME RETICULUM_SERVER: `${localDevHost}:4000`,
-    //FIXME POSTGREST_SERVER: `${localDevHost}:3001`,
+    RETICULUM_SERVER: `${mainHost}`,
+    //FIXME RETICULUM_SERVER: `${mainHost}:4000`,
+    //FIXME POSTGREST_SERVER: `${mainHost}:3001`,
     POSTGREST_SERVER: ``,
     ITA_SERVER: "",
-    //FIXME UPLOADS_HOST: `https://${localDevHost}:4000`
-    UPLOADS_HOST: `${localDevHost}`
+    //FIXME UPLOADS_HOST: `https://${mainHost}:4000`
+    UPLOADS_HOST: `${mainHost}`
   });
 
   const host = process.env.HOST_IP || "www.pet-mom.club";
