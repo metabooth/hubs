@@ -234,13 +234,14 @@ module.exports = async (env, argv) => {
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    CORS_PROXY_SERVER: `https://${mainHost}:8080`,
-    NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
+    CORS_PROXY_SERVER: `${mainHost}:8080`,
+    //FIXME NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
+    NON_CORS_PROXY_DOMAINS: mainHost,
     BASE_ASSETS_PATH: `/hubs-origin/`,
-    RETICULUM_SERVER: `${mainHost}`,
+    RETICULUM_SERVER: mainHost,
     POSTGREST_SERVER: ``,
     ITA_SERVER: "",
-    UPLOADS_HOST: `${mainHost}`
+    UPLOADS_HOST: mainHost
   });
 
   const host = process.env.HOST_IP || "www.pet-mom.club";
