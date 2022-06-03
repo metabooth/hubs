@@ -154,7 +154,16 @@ class ImportContentComponent extends Component {
       const url = urls[i];
 
       if (url.endsWith(".pack")) {
-        const res = await fetch(`https://${configs.CORS_PROXY_SERVER}/${url}`);
+        
+        //FIXME; SOOSKIM !
+        var proxy = "";
+        if (configs.CORS_PROXY_SERVER) {
+          proxy = `https://${configs.CORS_PROXY_SERVER}/${url}`;
+        } else {
+          proxy = url;
+        }
+
+        const res = await fetch(proxy);
         const packUrls = (await res.text()).split("\n");
         for (const u of packUrls) {
           if (u.trim() !== "") {
@@ -178,7 +187,15 @@ class ImportContentComponent extends Component {
 
       if (!importUrl) continue;
 
-      const res = await fetch(`https://${configs.CORS_PROXY_SERVER}/${importUrl}`);
+      //FIXME; SOOSKIM !
+      var proxy = "";
+      if (configs.CORS_PROXY_SERVER) {
+        proxy = `https://${configs.CORS_PROXY_SERVER}/${importUrl}`;
+      } else {
+        proxy = importUrl;
+      }
+
+      const res = await fetch();
       const type = isScene ? "scenes" : "avatars";
       const asset = (await res.json())[type][0];
       const isDefault = (isScene && needsDefaultScene) || (isAvatar && needsDefaultAvatar);
@@ -321,7 +338,13 @@ class ImportContentComponent extends Component {
           break;
       }
 
-      const screenshotUrl = `https://${configs.CORS_PROXY_SERVER}/${r.asset.screenshot_url || r.asset.files.thumbnail}`;
+      //FIXME; SOOSKIM !
+      const screenshotUrl;
+      if (configs.CORS_PROXY_SERVER) {
+        proxy = `https://${configs.CORS_PROXY_SERVER}/${r.asset.screenshot_url || r.asset.files.thumbnail}`;
+      } else {
+        proxy = `${r.asset.screenshot_url || r.asset.files.thumbnail}`;
+      }
 
       return (
         <TableRow key={r.url}>
