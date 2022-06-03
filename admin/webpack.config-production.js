@@ -65,21 +65,20 @@ module.exports = (env, argv) => {
   dotenv.config({ path: ".defaults.env" });
 
   const mainHost = "www.pet-mom.club";
+  const host = process.env.HOST_IP || mainHost;
+  const port = process.env.HOST_PORT || "8989";
 
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    CORS_PROXY_SERVER: `https://${mainHost}:8989`,
-    NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
+    CORS_PROXY_SERVER: `${mainHost}:4000`,
+    NON_CORS_PROXY_DOMAINS: `${mainHost}, raw.githubusercontent.com, hubs-proxy.com`,
     BASE_ASSETS_PATH: `/admin-origin/`,
-    RETICULUM_SERVER: `${mainHost}`,
+    RETICULUM_SERVER: `${mainHost}:4000`,
     POSTGREST_SERVER: ``,
     ITA_SERVER: ``,
-    UPLOADS_HOST: `${mainHost}`
+    UPLOADS_HOST: ``
   });
-
-  const host = process.env.HOST_IP || "www.pet-mom.club";
-  const port = process.env.HOST_PORT || "8989";
 
   const babelConfig = JSON.parse(
     fs
@@ -111,47 +110,47 @@ module.exports = (env, argv) => {
       headers: {
         "Access-Control-Allow-Origin": "*"
       },
-      before: function(app) {
-        app.all("/cors-proxy/*", (req, res) => {
-          res.header("Access-Control-Allow-Origin", "*");
-          res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-          res.header("Access-Control-Allow-Headers", "Range");
-          res.header(
-            "Access-Control-Expose-Headers",
-            "Accept-Ranges, Content-Encoding, Content-Length, Content-Range, Hub-Name, Hub-Entity-Type"
-          );
-          res.header("Vary", "Origin");
-          res.header("X-Content-Type-Options", "nosniff");
+      // before: function(app) {
+      //   app.all("/cors-proxy/*", (req, res) => {
+      //     res.header("Access-Control-Allow-Origin", "*");
+      //     res.header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+      //     res.header("Access-Control-Allow-Headers", "Range");
+      //     res.header(
+      //       "Access-Control-Expose-Headers",
+      //       "Accept-Ranges, Content-Encoding, Content-Length, Content-Range, Hub-Name, Hub-Entity-Type"
+      //     );
+      //     res.header("Vary", "Origin");
+      //     res.header("X-Content-Type-Options", "nosniff");
 
-          const redirectLocation = req.header("location");
+      //     const redirectLocation = req.header("location");
 
-          if (redirectLocation) {
-            res.header("Location", "https://${host}:${port}/cors-proxy/" + redirectLocation);
-          }
+      //     if (redirectLocation) {
+      //       res.header("Location", "https://${host}:${port}/cors-proxy/" + redirectLocation);
+      //     }
 
-          if (req.method === "OPTIONS") {
-            res.send();
-          } else {
-            const url = req.originalUrl.replace("/cors-proxy/", "");
-            request({ url, method: req.method }, error => {
-              if (error) {
-                console.error(`cors-proxy: error fetching "${url}"\n`, error);
-                return;
-              }
-            }).pipe(res);
-          }
-        });
+      //     if (req.method === "OPTIONS") {
+      //       res.send();
+      //     } else {
+      //       const url = req.originalUrl.replace("/cors-proxy/", "");
+      //       request({ url, method: req.method }, error => {
+      //         if (error) {
+      //           console.error(`cors-proxy: error fetching "${url}"\n`, error);
+      //           return;
+      //         }
+      //       }).pipe(res);
+      //     }
+      //   });
 
-        app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
-        app.head("*", function(req, res, next) {
-          if (req.method === "HEAD") {
-            res.append("Date", new Date().toGMTString());
-            res.send("");
-          } else {
-            next();
-          }
-        });
-      }
+      //   app.use(cors({ origin: /www\.pet-mom\.club(:\d*)?$/ }));
+      //   app.head("*", function(req, res, next) {
+      //     if (req.method === "HEAD") {
+      //       res.append("Date", new Date().toGMTString());
+      //       res.send("");
+      //     } else {
+      //       next();
+      //     }
+      //   });
+      // }
     },
     performance: {
       // Ignore media and sourcemaps when warning about file size.
