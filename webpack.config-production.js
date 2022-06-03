@@ -234,7 +234,8 @@ module.exports = async (env, argv) => {
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    CORS_PROXY_SERVER: `${mainHost}:8080`,
+    //FIXME: CORS_PROXY_SERVER: `${mainHost}:8080`,
+    CORS_PROXY_SERVER: `${mainHost}:4000`,
     //FIXME NON_CORS_PROXY_DOMAINS: `${mainHost}, https://raw.githubusercontent.com, https://hubs-proxy.com`,
     NON_CORS_PROXY_DOMAINS: mainHost,
     BASE_ASSETS_PATH: `/hubs-origin/`,

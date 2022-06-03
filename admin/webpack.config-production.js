@@ -71,7 +71,6 @@ module.exports = (env, argv) => {
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    //FIXME: CORS_PROXY_SERVER: ``,
     CORS_PROXY_SERVER: `${mainHost}:4000`,
     // FIXME NON_CORS_PROXY_DOMAINS: `${mainHost},raw.githubusercontent.com,mozilla.com,reticulum.io`,
     NON_CORS_PROXY_DOMAINS: `${mainHost}`,
