@@ -72,7 +72,7 @@ module.exports = (env, argv) => {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
     CORS_PROXY_SERVER: ``,
-    NON_CORS_PROXY_DOMAINS: `${mainHost}, raw.githubusercontent.com, hubs-proxy.com`,
+    NON_CORS_PROXY_DOMAINS: `${mainHost},raw.githubusercontent.com,mozilla.com,reticulum.io`,
     BASE_ASSETS_PATH: `/admin-origin/`,
     RETICULUM_SERVER: `${mainHost}`,
     POSTGREST_SERVER: ``,
