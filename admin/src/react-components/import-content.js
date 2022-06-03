@@ -195,7 +195,7 @@ class ImportContentComponent extends Component {
         proxy = importUrl;
       }
 
-      const res = await fetch();
+      const res = await fetch(proxy);
       const type = isScene ? "scenes" : "avatars";
       const asset = (await res.json())[type][0];
       const isDefault = (isScene && needsDefaultScene) || (isAvatar && needsDefaultAvatar);
@@ -341,9 +341,9 @@ class ImportContentComponent extends Component {
       //FIXME; SOOSKIM !
       var screenshotUrl = "";
       if (configs.CORS_PROXY_SERVER) {
-        proxy = `https://${configs.CORS_PROXY_SERVER}/${r.asset.screenshot_url || r.asset.files.thumbnail}`;
+        screenshotUrl = `https://${configs.CORS_PROXY_SERVER}/${r.asset.screenshot_url || r.asset.files.thumbnail}`;
       } else {
-        proxy = `${r.asset.screenshot_url || r.asset.files.thumbnail}`;
+        screenshotUrl = `${r.asset.screenshot_url || r.asset.files.thumbnail}`;
       }
 
       return (
