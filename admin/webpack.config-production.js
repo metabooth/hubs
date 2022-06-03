@@ -71,10 +71,10 @@ module.exports = (env, argv) => {
   Object.assign(process.env, {
     HOST: mainHost,
     RETICULUM_SOCKET_SERVER: mainHost,
-    CORS_PROXY_SERVER: `${mainHost}:4000`,
+    CORS_PROXY_SERVER: `${mainHost}`,
     NON_CORS_PROXY_DOMAINS: `${mainHost}, raw.githubusercontent.com, hubs-proxy.com`,
     BASE_ASSETS_PATH: `/admin-origin/`,
-    RETICULUM_SERVER: `${mainHost}:4000`,
+    RETICULUM_SERVER: `${mainHost}`,
     POSTGREST_SERVER: ``,
     ITA_SERVER: ``,
     UPLOADS_HOST: ``
