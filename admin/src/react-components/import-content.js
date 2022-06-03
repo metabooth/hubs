@@ -339,7 +339,7 @@ class ImportContentComponent extends Component {
       }
 
       //FIXME; SOOSKIM !
-      const screenshotUrl;
+      var screenshotUrl = "";
       if (configs.CORS_PROXY_SERVER) {
         proxy = `https://${configs.CORS_PROXY_SERVER}/${r.asset.screenshot_url || r.asset.files.thumbnail}`;
       } else {
