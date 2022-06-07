@@ -1,4 +1,7 @@
-import pdfjs from "pdfjs-dist";
+//FIXME
+// import pdfjs from "pdfjs-dist";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf";
+
 import { SOUND_CAMERA_TOOL_TOOK_SNAPSHOT } from "../systems/sound-effects-system";
 import { scaleToAspectRatio } from "../utils/scale-to-aspect-ratio";
 import { errorTexture } from "../utils/error-texture";
