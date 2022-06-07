@@ -5,7 +5,7 @@
   flex-flow: row;
   justify-content: flex-start;
   align-items: center;
-  
+
   :local(.range-slider) {
     width: 100%;
     display: flex;
@@ -25,8 +25,8 @@
     // Version 1.5.2
     // MIT License
 
-    $track-color: theme.$toggle-button-color !default;
-    $thumb-color: theme.$primary-color !default;
+    $track-color: theme.$toggle-button-color  !default;
+    $thumb-color: theme.$primary-color  !default;
 
     $thumb-radius: 15px !default;
     $thumb-height: 30px !default;
@@ -34,21 +34,21 @@
     $thumb-shadow-size: 0px !default;
     $thumb-shadow-blur: 0px !default;
     $thumb-border-width: 5px !default;
-    $thumb-border-color: theme.$primary-color !default;
+    $thumb-border-color: theme.$primary-color  !default;
 
     $track-width: 100% !default;
     $track-height: 9px !default;
     $track-shadow-size: 0px !default;
     $track-shadow-blur: 0px !default;
     $track-border-width: 0px !default;
-    $track-border-color: theme.$button-border-color !default;
+    $track-border-color: theme.$button-border-color  !default;
 
-    $progress-color: theme.$primary-color !default;
+    $progress-color: theme.$primary-color  !default;
 
     $track-radius: 5px !default;
     $contrast: 5% !default;
 
-    $ie-bottom-track-color: $track-color !default;
+    $ie-bottom-track-color: $track-color  !default;
 
     $range-opacity: 0.4 !default;
 
@@ -101,7 +101,7 @@
       &::-ms-thumb {
         @include thumb;
         cursor: pointer;
-        margin-top: $track-height / 4;
+        margin-top: calc($track-height / 4); //FIXME
       }
     }
   }
