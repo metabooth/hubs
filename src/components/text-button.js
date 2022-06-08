@@ -68,5 +68,9 @@ AFRAME.registerComponent("text-raycast-hack", {
   dependencies: ["text"],
   init() {
     this.el.getObject3D("text").raycast = noop;
+
+    //FIXME: TEST
+    this.el.getObject3D("text").font = "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json";
+    this.el.getObject3D("text").font = "msdf";
   }
 });
