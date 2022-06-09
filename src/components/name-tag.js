@@ -268,7 +268,7 @@ AFRAME.registerComponent("name-tag", {
     //FIXME: TEST
     this.nametagText.el.setAttribute("text", {
       shader: "msdf",
-      font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json",
+      fontUrl: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json",
     });
 
     this.nametagText.el.components["text"].getSize(this.size);

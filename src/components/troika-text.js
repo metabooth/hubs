@@ -80,7 +80,8 @@ AFRAME.registerComponent("text", {
     textIndent: { type: "number", default: 0 },
     whiteSpace: { default: "normal", oneOf: ["normal", "nowrap"] },
     opacity: { type: "number", default: 1.0 },
-    side: { default: "front", oneOf: ["front", "back", "double"] }
+    side: { default: "front", oneOf: ["front", "back", "double"] },
+    shader: { default: "msdf", oneOf: ["msdf", ""] },
   },
 
   /**
