@@ -266,10 +266,10 @@ AFRAME.registerComponent("name-tag", {
     this.nametagElPosY = this.nametagHeight + (this.isHandRaised ? NAMETAG_OFFSET : 0);
 
     //FIXME: TEST
-    this.nametagText.el.setAttribute("text", {
-      shader: "msdf",
-      fontUrl: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json",
-    });
+    // this.nametagText.el.setAttribute("text", {
+    //   shader: "msdf",
+    //   fontUrl: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json",
+    // });
 
     this.nametagText.el.components["text"].getSize(this.size);
     this.size.x = Math.max(this.size.x, NAMETAG_MIN_WIDTH);
