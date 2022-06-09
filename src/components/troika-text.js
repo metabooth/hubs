@@ -81,7 +81,7 @@ AFRAME.registerComponent("text", {
     whiteSpace: { default: "normal", oneOf: ["normal", "nowrap"] },
     opacity: { type: "number", default: 1.0 },
     side: { default: "front", oneOf: ["front", "back", "double"] },
-    shader: { default: "msdf", oneOf: ["msdf", ""] },
+    shader: { default: "msdf", oneOf: ["msdf", "standard"] },
   },
 
   /**
@@ -90,6 +90,9 @@ AFRAME.registerComponent("text", {
   init: function() {
     this.troikaTextMesh = new Text();
     this.troikaTextMesh.material.toneMapped = false;
+    //FIXME: TEST
+    this.troikaTextMesh.material.shader = 'msdf';
+
     this.el.setObject3D("text", this.troikaTextMesh);
   },
 
