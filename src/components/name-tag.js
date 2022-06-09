@@ -227,7 +227,7 @@ AFRAME.registerComponent("name-tag", {
         this.displayName = this.displayName.slice(0, DISPLAY_NAME_LENGTH).concat("...");
       }
       this.nametagText.el.setAttribute("text", {
-        value: this.displayName
+        value: "Name Tag Text" //FIXME this.displayName
       });
       this.prevDisplayName = this.displayName;
     }
@@ -237,7 +237,7 @@ AFRAME.registerComponent("name-tag", {
         this.identityName = this.identityName.slice(0, DISPLAY_NAME_LENGTH).concat("...");
       }
       this.nametagIdentityName.el.setAttribute("text", { 
-        value: this.identityName
+        value:  "Identity Name" //FIXME this.identityName
       });
     }
   },
