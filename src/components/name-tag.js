@@ -228,8 +228,8 @@ AFRAME.registerComponent("name-tag", {
       }
       this.nametagText.el.setAttribute("text", {
         value: this.displayName,
-        // shader: "msdf",
-        // font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
+        shader: "msdf",
+        font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
       });
       this.prevDisplayName = this.displayName;
     }
@@ -240,8 +240,8 @@ AFRAME.registerComponent("name-tag", {
       }
       this.nametagIdentityName.el.setAttribute("text", { 
         value: this.identityName,
-        // shader: "msdf",
-        // font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
+        shader: "msdf",
+        font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
       });
     }
   },
