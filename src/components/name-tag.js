@@ -227,7 +227,9 @@ AFRAME.registerComponent("name-tag", {
         this.displayName = this.displayName.slice(0, DISPLAY_NAME_LENGTH).concat("...");
       }
       this.nametagText.el.setAttribute("text", {
-        value: this.displayName
+        value: this.displayName,
+        // shader: "msdf",
+        // font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
       });
       this.prevDisplayName = this.displayName;
     }
@@ -236,7 +238,11 @@ AFRAME.registerComponent("name-tag", {
       if (this.identityName.length > DISPLAY_NAME_LENGTH) {
         this.identityName = this.identityName.slice(0, DISPLAY_NAME_LENGTH).concat("...");
       }
-      this.nametagIdentityName.el.setAttribute("text", { value: this.identityName });
+      this.nametagIdentityName.el.setAttribute("text", { 
+        value: this.identityName,
+        // shader: "msdf",
+        // font: "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json"
+      });
     }
   },
 
@@ -280,6 +286,9 @@ AFRAME.registerComponent("name-tag", {
     nametagVolumeMaterial.color.set(getThemeColor("nametag-volume-color"));
     this.nametagBackground.el.setAttribute("slice9", "color", getThemeColor("nametag-color"));
     this.nametagText.el.setAttribute("text", "color", getThemeColor("nametag-text-color"));
+    //FIXME: TEST
+    this.nametagText.el.setAttribute("text", "shader", "msdf");
+    this.nametagText.el.setAttribute("text", "font", "https://raw.githubusercontent.com/myso-kr/aframe-fonts-korean/master/fonts/ofl/nanumgothic/NanumGothic-Regular.json");
   },
 
   onStateChanged() {
