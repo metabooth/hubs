@@ -90,9 +90,6 @@ AFRAME.registerComponent("text", {
   init: function() {
     this.troikaTextMesh = new Text();
     this.troikaTextMesh.material.toneMapped = false;
-    //FIXME: TEST
-    this.troikaTextMesh.material.shader = 'msdf';
-
     this.el.setObject3D("text", this.troikaTextMesh);
   },
 
